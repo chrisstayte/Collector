@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -100,62 +99,69 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  SizedBox(
-                    height: 135,
-                    child: Card(
-                      elevation: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Global.colors.darkIconColor,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: SizedBox(
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/item',
+                    ),
+                    child: SizedBox(
+                      height: 135,
+                      child: Card(
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 100,
                                 height: 100,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    AutoSizeText(
-                                      'Title',
-                                      maxLines: 2,
-                                      maxFontSize: 24,
-                                      minFontSize: 12,
-                                      style: TextStyle(
-                                          color: Global.colors.darkIconColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 24),
-                                    ),
-                                    Text(
-                                      'Date',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Global.colors.darkIconColor,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Position',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Global.colors.darkIconColor,
-                                      ),
-                                    ),
-                                  ],
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Global.colors.darkIconColor,
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 100,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      AutoSizeText(
+                                        'Title',
+                                        maxLines: 2,
+                                        maxFontSize: 24,
+                                        minFontSize: 12,
+                                        style: TextStyle(
+                                            color: Global.colors.darkIconColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 24),
+                                      ),
+                                      Text(
+                                        'Date',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Global.colors.darkIconColor,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Position',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Global.colors.darkIconColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

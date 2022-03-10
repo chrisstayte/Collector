@@ -1,10 +1,19 @@
+import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
+import 'package:collector/screens/add_item_screen.dart';
 import 'package:collector/screens/camera_screen.dart';
 import 'package:collector/screens/home_screen.dart';
+import 'package:collector/screens/item_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
-void main() {
+// late List<CameraDescription> cameras;
+
+void main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+
+  // cameras = await availableCameras();
+
   runApp(const MyApp());
 }
 
@@ -21,10 +30,13 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Global.colors.lightIconColor,
         appBarTheme: AppBarTheme(
           color: Global.colors.lightIconColor,
-          titleTextStyle: Theme.of(context).textTheme.headline4?.copyWith(
+          titleTextStyle: Theme.of(context).textTheme.headline5?.copyWith(
                 color: Global.colors.darkIconColor,
               ),
           elevation: 0,
+          iconTheme: IconThemeData(
+            color: Global.colors.lightIconColorDarker,
+          ),
         ),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
             backgroundColor: Global.colors.darkIconColor),
@@ -43,6 +55,16 @@ class MyApp extends StatelessWidget {
           case '/camera':
             return PageTransition(
               child: CameraScreen(),
+              type: PageTransitionType.rightToLeft,
+            );
+          case '/addItem':
+            return PageTransition(
+              child: AddItemScreen(),
+              type: PageTransitionType.bottomToTop,
+            );
+          case '/item':
+            return PageTransition(
+              child: ItemScreen(),
               type: PageTransitionType.rightToLeft,
             );
         }

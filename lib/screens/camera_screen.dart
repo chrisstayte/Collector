@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
+import 'package:collector/main.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -11,27 +13,72 @@ class CameraScreen extends StatefulWidget {
   _CameraScreenState createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
-  late CameraController _controller;
+class _CameraScreenState extends State<CameraScreen>
+    with WidgetsBindingObserver {
+  late List<CameraDescription> _cameras;
+  CameraController? _controller;
   late Future<void> _initializeControllerFuture;
 
   @override
   void initState() {
     // TODO: implement initState
 
-    // _controller = CameraController(
+    _initCamera();
 
-    //   ResolutionPreset.high,
-    // );
+    if (_cameras.length > 0) {
+      _controller = CameraController(_cameras[0], ResolutionPreset.max);
+      _initializeControllerFuture = _controller!.initialize();
+    } else {
+      _initializeControllerFuture = Future<void>.error((_) => {});
+    }
   }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            color: Colors.black,
+          FutureBuilder<void>(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (_controller != null) {
+                  return Positioned(
+                    top: 0,
+                    bottom: 0,
+                    child: CameraPreview(_controller!),
+                  );
+                } else {
+                  return Container(
+                    color: Colors.black,
+                    child: Center(
+                      child: Text(
+                        'Camera Not Available',
+                        style: TextStyle(
+                          color: CupertinoColors.systemRed,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
           ),
           Positioned(
             left: 0,
@@ -42,25 +89,40 @@ class _CameraScreenState extends State<CameraScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.settings,
-                      color: Colors.white,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.close_outlined,
+                          color: Colors.white,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.settings,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
-                  child: Container(
-                    height: 64,
-                    width: 64,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        width: 3,
-                        color: Global.colors.darkIconColor,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, '/addItem'),
+                    child: Container(
+                      height: 64,
+                      width: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          width: 3,
+                          color: Global.colors.darkIconColor,
+                        ),
+                        color: Global.colors.lightIconColor.withOpacity(.5),
                       ),
-                      color: Global.colors.lightIconColor.withOpacity(.5),
                     ),
                   ),
                 ),
@@ -103,5 +165,30 @@ class _CameraScreenState extends State<CameraScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _initCamera() async {
+    _cameras = await availableCameras();
+  }
+
+  Future<void> _setupCamera() async {
+    if (cameras.length <= 0) return;
+
+    if (_controller != null) {
+      await _controller!.dispose();
+    }
+
+    _controller = CameraController(
+      cameras[0],
+      ResolutionPreset.max,
+      enableAudio: false,
+      imageFormatGroup: ImageFormatGroup.jpeg,
+    );
+
+    try {
+      await _controller!.initialize();
+    } on CameraException catch (e) {
+      print(e);
+    }
   }
 }
