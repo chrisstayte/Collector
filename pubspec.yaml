@@ -23,6 +23,8 @@ dependencies:
   page_transition: ^2.0.5
   font_awesome_flutter: ^9.2.0
   location: ^4.3.0
+  geolocator: ^8.2.0
+  flutter_compass: ^0.7.0
 
 dev_dependencies:
   flutter_test:
