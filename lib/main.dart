@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           case '/camera':
             return PageTransition(
               child: CameraScreen(),
-              type: PageTransitionType.rightToLeft,
+              type: PageTransitionType.bottomToTop,
             );
           case '/addItem':
             return PageTransition(

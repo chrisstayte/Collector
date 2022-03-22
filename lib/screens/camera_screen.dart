@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _CameraScreenState extends State<CameraScreen>
   StreamSubscription<Position>? _positionStream;
   late StreamSubscription<CompassEvent>? _compassStream;
   CameraController? _controller;
+  FlashMode _flashMode = FlashMode.auto;
 
   late String _heading = "";
   late String _altitude = "";
@@ -31,7 +33,6 @@ class _CameraScreenState extends State<CameraScreen>
 
   @override
   void initState() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     WidgetsBinding.instance?.addObserver(this);
     _setupGPS();
     _setupCamera();
@@ -41,6 +42,7 @@ class _CameraScreenState extends State<CameraScreen>
   void dispose() {
     WidgetsBinding.instance?.removeObserver(this);
     _controller?.dispose();
+    _controller = null;
     _positionStream?.cancel();
     _compassStream?.cancel();
     super.dispose();
@@ -52,6 +54,7 @@ class _CameraScreenState extends State<CameraScreen>
     switch (state) {
       case AppLifecycleState.inactive:
         _controller?.dispose();
+        _controller = null;
         _positionStream?.cancel();
         _compassStream?.cancel();
         break;
@@ -127,10 +130,11 @@ class _CameraScreenState extends State<CameraScreen>
             ),
           ),
           Positioned(
-            top: 80,
-            left: 0,
+            top: 50,
+            left: 20,
             right: 0,
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Chip(
@@ -141,20 +145,27 @@ class _CameraScreenState extends State<CameraScreen>
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  backgroundColor:
-                      Global.colors.lightIconColor.withOpacity(0.5),
+                  avatar: FaIcon(
+                    FontAwesomeIcons.solidCompass,
+                    color: Global.colors.darkIconColor,
+                  ),
+                  backgroundColor: Global.colors.lightIconColor,
                 ),
                 Chip(
                   label: Text(_position),
-                  backgroundColor:
-                      Global.colors.lightIconColor.withOpacity(0.5),
+                  avatar: FaIcon(
+                    FontAwesomeIcons.locationCrosshairs,
+                    color: Global.colors.darkIconColor,
+                  ),
+                  backgroundColor: Global.colors.lightIconColor,
                 ),
                 Chip(
-                  label: Text(
-                    _altitude,
+                  label: Text(_altitude),
+                  avatar: FaIcon(
+                    FontAwesomeIcons.circleArrowUp,
+                    color: Global.colors.darkIconColor,
                   ),
-                  backgroundColor:
-                      Global.colors.lightIconColor.withOpacity(0.5),
+                  backgroundColor: Global.colors.lightIconColor,
                 ),
               ],
             ),
@@ -167,13 +178,44 @@ class _CameraScreenState extends State<CameraScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: () => {},
+                  onPressed: () {
+                    if (_flashMode == FlashMode.auto) {
+                      setState(() {
+                        _flashMode = FlashMode.always;
+                      });
+                    } else if (_flashMode == FlashMode.always) {
+                      setState(() {
+                        _flashMode = FlashMode.off;
+                      });
+                    } else {
+                      _flashMode = FlashMode.auto;
+                    }
+
+                    _controller?.setFlashMode(_flashMode);
+                  },
                   icon: Icon(
-                    Icons.flash_auto,
+                    _flashMode == FlashMode.auto
+                        ? Icons.flash_auto
+                        : _flashMode == FlashMode.always
+                            ? Icons.flash_on
+                            : Icons.flash_off,
                     color: Colors.white,
                   ),
                 ),
               ],
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: ClipRect(
+              child: SizedBox(
+                  height: 45,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(),
+                  )),
             ),
           ),
         ],
@@ -181,21 +223,31 @@ class _CameraScreenState extends State<CameraScreen>
     );
   }
 
+  void _setupPage() {
+    // TODO: Permissions
+
+    _setupCamera();
+    _setupGPS();
+  }
+
   Future<void> _setupCamera() async {
     try {
       _cameras = await availableCameras();
+      if (_cameras.length < 1) {
+        return;
+      }
       _controller = CameraController(
         _cameras[0],
         ResolutionPreset.max,
         enableAudio: false,
         imageFormatGroup: ImageFormatGroup.jpeg,
       );
-      // await _controller?.initialize().then((_) => {
-      //       if (mounted) {
-      //         setState((() => {})
-      //       }
-      //     });
-
+      await _controller?.initialize().then((_) async {
+        await _controller?.lockCaptureOrientation(DeviceOrientation.portraitUp);
+        if (mounted) {
+          setState((() => {}));
+        }
+      });
     } catch (_) {}
   }
 
