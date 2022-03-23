@@ -5,15 +5,19 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/main.dart';
+import 'package:collector/widgets/permissions_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({Key? key}) : super(key: key);
+  const CameraScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _CameraScreenState createState() => _CameraScreenState();
@@ -23,7 +27,7 @@ class _CameraScreenState extends State<CameraScreen>
     with WidgetsBindingObserver {
   late List<CameraDescription> _cameras;
   StreamSubscription<Position>? _positionStream;
-  late StreamSubscription<CompassEvent>? _compassStream;
+  StreamSubscription<CompassEvent>? _compassStream;
   CameraController? _controller;
   FlashMode _flashMode = FlashMode.auto;
 
@@ -34,8 +38,9 @@ class _CameraScreenState extends State<CameraScreen>
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
-    _setupGPS();
-    _setupCamera();
+    // _setupGPS();
+    // _setupCamera();
+    _setupPage();
   }
 
   @override
@@ -59,8 +64,9 @@ class _CameraScreenState extends State<CameraScreen>
         _compassStream?.cancel();
         break;
       case AppLifecycleState.resumed:
-        _setupGPS();
-        _setupCamera();
+        // _setupGPS();
+        // _setupCamera();
+        _setupPage();
         break;
     }
     super.didChangeAppLifecycleState(state);
@@ -223,11 +229,72 @@ class _CameraScreenState extends State<CameraScreen>
     );
   }
 
-  void _setupPage() {
+  void _setupPage() async {
     // TODO: Permissions
 
-    _setupCamera();
-    _setupGPS();
+    bool hasAccessToLocation = false;
+    bool hasAccessToCamera = false;
+
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.location,
+      Permission.camera,
+    ].request();
+
+    if (statuses[Permission.location]!.isGranted) {
+      hasAccessToLocation = true;
+    }
+
+    if (statuses[Permission.camera]!.isGranted) {
+      hasAccessToCamera = true;
+    }
+
+    // // CAMERA
+    // var status = await Permission.camera.status;
+
+    // if (status.isDenied) {
+    //   hasAccessToCamera = await Permission.camera.request().isGranted;
+    // } else if (status.isGranted) {
+    //   hasAccessToCamera = true;
+    // }
+
+    // status = await Permission.locationWhenInUse.status;
+    // if (status.isDenied) {
+    //   hasAccessToLocation =
+    //       await Permission.locationWhenInUse.request().isGranted;
+    // } else if (status.isGranted) {
+    //   hasAccessToLocation = true;
+    // }
+
+    if (!hasAccessToCamera || !hasAccessToLocation) {
+      showGeneralDialog(
+        context: context,
+        pageBuilder: (_, __, ___) {
+          return PermissionsDialog(
+            cameraPermission: hasAccessToCamera,
+            locationPermission: hasAccessToLocation,
+          );
+        },
+        transitionBuilder: (_, anim, __, child) {
+          Tween<Offset> tween;
+          if (anim.status == AnimationStatus.reverse) {
+            tween = Tween(begin: Offset(0, -1), end: Offset.zero);
+          } else {
+            tween = Tween(begin: Offset(0, 1), end: Offset.zero);
+          }
+
+          return SlideTransition(
+            position: tween.animate(anim),
+            child: FadeTransition(
+              opacity: anim,
+              child: child,
+            ),
+          );
+        },
+      );
+    } else {
+      _setupCamera();
+      _setupGPS();
+    }
   }
 
   Future<void> _setupCamera() async {
@@ -288,7 +355,6 @@ class _CameraScreenState extends State<CameraScreen>
           cardinalDirection = 'NW';
         }
       }
-
       setState(() {
         _heading =
             '${event.headingForCameraMode?.round().toString()} $cardinalDirection';

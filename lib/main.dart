@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
           case '/':
             return PageTransition(
               child: HomeScreen(),
-              type: PageTransitionType.rightToLeft,
+              type: PageTransitionType.leftToRight,
             );
           case '/camera':
             return PageTransition(
