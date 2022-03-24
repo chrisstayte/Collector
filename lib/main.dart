@@ -1,20 +1,31 @@
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
+import 'package:collector/models/addItemArguments.dart';
+import 'package:collector/providers/collector_provider.dart';
+import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/screens/add_item_screen.dart';
 import 'package:collector/screens/camera_screen.dart';
 import 'package:collector/screens/home_screen.dart';
 import 'package:collector/screens/item_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
-
-// late List<CameraDescription> cameras;
+import 'package:provider/provider.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-
-  // cameras = await availableCameras();
-
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<SettingsProvider>(
+          create: (_) => SettingsProvider(),
+        ),
+        ChangeNotifierProvider<CollectorProvider>(
+          lazy: false,
+          create: (_) => CollectorProvider(),
+        )
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -58,8 +69,9 @@ class MyApp extends StatelessWidget {
               type: PageTransitionType.bottomToTop,
             );
           case '/addItem':
+            final args = settings.arguments as AddItemArguments;
             return PageTransition(
-              child: AddItemScreen(),
+              child: AddItemScreen(newItemArguments: args),
               type: PageTransitionType.bottomToTop,
             );
           case '/item':

@@ -24,6 +24,7 @@ dependencies:
   font_awesome_flutter: ^10.0.0
   geolocator: ^8.2.0
   flutter_compass: ^0.7.0
+  shared_preferences: ^2.0.13
 
 dev_dependencies:
   flutter_test:

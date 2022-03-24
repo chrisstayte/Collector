@@ -5,6 +5,8 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/main.dart';
+import 'package:collector/models/addItemArguments.dart';
+import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/widgets/permissions_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({
@@ -44,12 +47,13 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     WidgetsBinding.instance?.removeObserver(this);
     _controller?.dispose();
     _controller = null;
     _positionStream?.cancel();
     _compassStream?.cancel();
+
     super.dispose();
   }
 
@@ -57,11 +61,11 @@ class _CameraScreenState extends State<CameraScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print(state.toString());
     switch (state) {
-      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
         _controller?.dispose();
         _controller = null;
-        _positionStream?.cancel();
-        _compassStream?.cancel();
+        _positionStream?.pause();
+        _compassStream?.pause();
         break;
       case AppLifecycleState.resumed:
         // _setupGPS();
@@ -75,6 +79,7 @@ class _CameraScreenState extends State<CameraScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.black,
       body: Stack(
         children: [
@@ -108,7 +113,22 @@ class _CameraScreenState extends State<CameraScreen>
                 ),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, '/addItem'),
+                    onTap: () async {
+                      if (_controller != null) {
+                        if (_controller!.value.isInitialized) {
+                          if (!_controller!.value.isTakingPicture) {
+                            await _controller?.takePicture().then((value) =>
+                                Navigator.pushNamed(context, '/addItem',
+                                    arguments: AddItemArguments(
+                                        photo: value,
+                                        latitude: 0.0,
+                                        longitude: 0.0,
+                                        heading: 0.0,
+                                        altitude: 0.0)));
+                          }
+                        }
+                      }
+                    },
                     child: Container(
                       height: 84,
                       width: 84,
@@ -185,24 +205,31 @@ class _CameraScreenState extends State<CameraScreen>
               children: [
                 IconButton(
                   onPressed: () {
-                    if (_flashMode == FlashMode.auto) {
-                      setState(() {
-                        _flashMode = FlashMode.always;
-                      });
-                    } else if (_flashMode == FlashMode.always) {
-                      setState(() {
-                        _flashMode = FlashMode.off;
-                      });
+                    if (context.read<SettingsProvider>().flashMode ==
+                        FlashMode.auto) {
+                      context
+                          .read<SettingsProvider>()
+                          .setFlashMode(FlashMode.always);
+                      _controller?.setFlashMode(FlashMode.always);
+                    } else if (context.read<SettingsProvider>().flashMode ==
+                        FlashMode.always) {
+                      context
+                          .read<SettingsProvider>()
+                          .setFlashMode(FlashMode.off);
+                      _controller?.setFlashMode(FlashMode.off);
                     } else {
-                      _flashMode = FlashMode.auto;
+                      context
+                          .read<SettingsProvider>()
+                          .setFlashMode(FlashMode.auto);
+                      _controller?.setFlashMode(FlashMode.auto);
                     }
-
-                    _controller?.setFlashMode(_flashMode);
                   },
                   icon: Icon(
-                    _flashMode == FlashMode.auto
+                    context.watch<SettingsProvider>().flashMode ==
+                            FlashMode.auto
                         ? Icons.flash_auto
-                        : _flashMode == FlashMode.always
+                        : context.read<SettingsProvider>().flashMode ==
+                                FlashMode.always
                             ? Icons.flash_on
                             : Icons.flash_off,
                     color: Colors.white,
@@ -248,23 +275,6 @@ class _CameraScreenState extends State<CameraScreen>
       hasAccessToCamera = true;
     }
 
-    // // CAMERA
-    // var status = await Permission.camera.status;
-
-    // if (status.isDenied) {
-    //   hasAccessToCamera = await Permission.camera.request().isGranted;
-    // } else if (status.isGranted) {
-    //   hasAccessToCamera = true;
-    // }
-
-    // status = await Permission.locationWhenInUse.status;
-    // if (status.isDenied) {
-    //   hasAccessToLocation =
-    //       await Permission.locationWhenInUse.request().isGranted;
-    // } else if (status.isGranted) {
-    //   hasAccessToLocation = true;
-    // }
-
     if (!hasAccessToCamera || !hasAccessToLocation) {
       showGeneralDialog(
         context: context,
@@ -298,6 +308,8 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   Future<void> _setupCamera() async {
+    if (_controller != null) return;
+
     try {
       _cameras = await availableCameras();
       if (_cameras.length < 1) {
@@ -305,60 +317,71 @@ class _CameraScreenState extends State<CameraScreen>
       }
       _controller = CameraController(
         _cameras[0],
-        ResolutionPreset.max,
+        ResolutionPreset.high,
         enableAudio: false,
-        imageFormatGroup: ImageFormatGroup.jpeg,
+        imageFormatGroup: ImageFormatGroup.yuv420,
       );
       await _controller?.initialize().then((_) async {
         await _controller?.lockCaptureOrientation(DeviceOrientation.portraitUp);
+        await _controller?.setFlashMode(_flashMode);
         if (mounted) {
           setState((() => {}));
         }
+      }).onError((error, stackTrace) {
+        debugPrint('camera initialize error: ${error?.toString()}');
       });
     } catch (_) {}
   }
 
   Future<void> _setupGPS() async {
     // This handles the coordinates and altitude
-    _positionStream = Geolocator.getPositionStream().listen(
-      (Position? position) {
-        if (position != null) {
-          setState(() {
-            //_heading = position.heading.round().toString();
-            _altitude = "${position.altitude.round().toString()}m";
-            _position =
-                "${position.latitude.toStringAsFixed(4)},  ${position.longitude.toStringAsFixed(4)}";
-          });
-        }
-      },
-    );
+    if (_positionStream != null) {
+      _positionStream!.resume();
+    } else {
+      _positionStream = Geolocator.getPositionStream().listen(
+        (Position? position) {
+          if (position != null) {
+            setState(() {
+              //_heading = position.heading.round().toString();
+              _altitude = "${position.altitude.round().toString()}m";
+              _position =
+                  "${position.latitude.toStringAsFixed(4)},  ${position.longitude.toStringAsFixed(4)}";
+            });
+          }
+        },
+      );
+    }
 
     // This handles the heading
-    _compassStream = FlutterCompass.events?.listen((event) {
-      var cardinalDirection = '';
-      if (event.heading != null) {
-        if (event.heading! > 337.5 || event.heading! <= 22.5) {
-          cardinalDirection = 'N';
-        } else if (event.heading! > 22.5 && event.heading! <= 67.5) {
-          cardinalDirection = 'NE';
-        } else if (event.heading! > 67.5 && event.heading! <= 112.5) {
-          cardinalDirection = 'E';
-        } else if (event.heading! > 112.5 && event.heading! <= 157.5) {
-          cardinalDirection = 'SE';
-        } else if (event.heading! > 157.5 && event.heading! <= 202.5) {
-          cardinalDirection = 'S';
-        } else if (event.heading! > 202.5 && event.heading! <= 247.5) {
-          cardinalDirection = 'SW';
-        } else if (event.heading! > 247.5 && event.heading! <= 292.5) {
-          cardinalDirection = 'W';
-        } else if (event.heading! > 292.5 && event.heading! <= 337.5) {
-          cardinalDirection = 'NW';
+    if (_compassStream != null) {
+      _compassStream!.resume();
+    } else {
+      _compassStream = FlutterCompass.events?.listen((event) {
+        var cardinalDirection = '';
+        if (event.heading != null) {
+          if (event.heading! > 337.5 || event.heading! <= 22.5) {
+            cardinalDirection = 'N';
+          } else if (event.heading! > 22.5 && event.heading! <= 67.5) {
+            cardinalDirection = 'NE';
+          } else if (event.heading! > 67.5 && event.heading! <= 112.5) {
+            cardinalDirection = 'E';
+          } else if (event.heading! > 112.5 && event.heading! <= 157.5) {
+            cardinalDirection = 'SE';
+          } else if (event.heading! > 157.5 && event.heading! <= 202.5) {
+            cardinalDirection = 'S';
+          } else if (event.heading! > 202.5 && event.heading! <= 247.5) {
+            cardinalDirection = 'SW';
+          } else if (event.heading! > 247.5 && event.heading! <= 292.5) {
+            cardinalDirection = 'W';
+          } else if (event.heading! > 292.5 && event.heading! <= 337.5) {
+            cardinalDirection = 'NW';
+          }
         }
-      }
-      setState(() {
-        _heading =
-            '${event.headingForCameraMode?.round().toString()} $cardinalDirection';
+        setState(() {
+          _heading =
+              '${event.headingForCameraMode?.round().toString()} $cardinalDirection';
+        });
       });
-    });
+    }
   }
 }
