@@ -70,4 +70,10 @@ class CollectorProvider extends ChangeNotifier {
     notifyListeners();
     await _saveCollectorItems();
   }
+
+  void deleteAllItems() async {
+    _collectorItems.clear();
+    notifyListeners();
+    await _saveCollectorItems();
+  }
 }

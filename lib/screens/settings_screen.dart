@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
+import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -156,7 +157,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text(
-              'Credits',
+              'Data',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+          ),
+          ListTile(
+            leading: FaIcon(FontAwesomeIcons.trashCan),
+            title: Text('Delete All Data'),
+            onLongPress: () {
+              context.read<CollectorProvider>().deleteAllItems();
+            },
+          ),
+          ListTile(
+            title: Text(
+              'FAQ',
               style: Theme.of(context).textTheme.headline5,
             ),
           ),
