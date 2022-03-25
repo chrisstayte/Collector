@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,8 +10,21 @@ import 'package:path_provider/path_provider.dart';
 class CollectorProvider extends ChangeNotifier {
   final String _fileName = 'collectoritems.json';
 
+  String _searchString = "";
+  set searchString(String value) {
+    _searchString = value;
+    notifyListeners();
+  }
+
   List<Item> _collectorItems = [];
-  List<Item> get collectorItems => _collectorItems;
+  UnmodifiableListView<Item> get collectorItems => _searchString.isEmpty
+      ? UnmodifiableListView<Item>(_collectorItems)
+      : UnmodifiableListView(
+          _collectorItems.where(
+            (item) =>
+                item.title.toLowerCase().contains(_searchString.toLowerCase()),
+          ),
+        );
 
   CollectorProvider() {
     _loadCollectorItems();
@@ -59,19 +73,19 @@ class CollectorProvider extends ChangeNotifier {
     file.writeAsString(collectorItems);
   }
 
-  void addItem(Item item) async {
+  Future<void> addItem(Item item) async {
     _collectorItems.insert(0, item);
     notifyListeners();
     await _saveCollectorItems();
   }
 
-  void deleteItem(Item item) async {
+  Future<void> deleteItem(Item item) async {
     _collectorItems.remove(item);
     notifyListeners();
     await _saveCollectorItems();
   }
 
-  void deleteAllItems() async {
+  Future<void> deleteAllItems() async {
     _collectorItems.clear();
     notifyListeners();
     await _saveCollectorItems();

@@ -26,6 +26,7 @@ dependencies:
   flutter_compass: ^0.7.0
   shared_preferences: ^2.0.13
   uuid: ^3.0.6
+  flutter_sms: ^2.3.2
 
 dev_dependencies:
   flutter_test:

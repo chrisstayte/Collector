@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/models/addItemArguments.dart';
+import 'package:collector/models/item.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/screens/add_item_screen.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Collector',
       showSemanticsDebugger: false,
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
@@ -116,8 +117,11 @@ class MyApp extends StatelessWidget {
               type: PageTransitionType.bottomToTop,
             );
           case '/item':
+            final item = settings.arguments as Item;
             return PageTransition(
-              child: ItemScreen(),
+              child: ItemScreen(
+                item: item,
+              ),
               type: PageTransitionType.rightToLeft,
             );
           case '/settings':

@@ -5,7 +5,9 @@ import 'package:collector/providers/settings_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -15,9 +17,22 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  PackageInfo _packageInfo = PackageInfo(
+      appName: 'Unknown',
+      packageName: 'Unknown',
+      version: 'Unknown',
+      buildNumber: 'Unknown',
+      buildSignature: 'Unknown');
+
   @override
   void initState() {
+    _initPackageInfo();
     super.initState();
+  }
+
+  Future<void> _initPackageInfo() async {
+    await PackageInfo.fromPlatform()
+        .then((value) => setState(() => _packageInfo = value));
   }
 
   @override
@@ -164,9 +179,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: FaIcon(FontAwesomeIcons.trashCan),
             title: Text('Delete All Data'),
-            onLongPress: () {
-              context.read<CollectorProvider>().deleteAllItems();
-            },
+            onTap: () => showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Delete all items?'),
+                  content: const Text('This is not reversable'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => context
+                          .read<CollectorProvider>()
+                          .deleteAllItems()
+                          .then(
+                            (value) => Navigator.pop(context),
+                          ),
+                      child: const Text('Yes'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('No'),
+                    )
+                  ],
+                );
+              },
+            ),
           ),
           ListTile(
             title: Text(
@@ -177,18 +213,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: FaIcon(FontAwesomeIcons.envelope),
             title: Text('collector@chrisstayte.com'),
+            onTap: () async {
+              final Uri params = Uri(
+                scheme: 'mailto',
+                path: 'collector@chrisstayte.com',
+                query: 'subject=App Feedback (${_packageInfo.version})',
+              );
+              final String url = params.toString();
+              if (await canLaunch(url)) {
+                await launch(url);
+              }
+            },
           ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.fileLines),
-            title: Text('Licenses'),
+          // ListTile(
+          //   leading: FaIcon(FontAwesomeIcons.fileLines),
+          //   title: Text('Licenses'),
+          //   onTap: () => Navigator.push(context, LicensePage()),
+          // ),
+          AboutListTile(
+            icon: FaIcon(FontAwesomeIcons.fileLines),
+            child: const Text('License'),
           ),
           ListTile(
             leading: FaIcon(FontAwesomeIcons.github),
             title: Text('Repo'),
+            onTap: () async {
+              final Uri params = Uri(
+                scheme: 'https',
+                path: 'www.github.com/ChrisStayte/Collector',
+              );
+              final String url = params.toString();
+              if (await canLaunch(url)) {
+                await launch(url);
+              }
+            },
           ),
           ListTile(
             leading: FaIcon(FontAwesomeIcons.circleInfo),
-            title: Text('Version Number'),
+            title: Text('${_packageInfo.version}'),
           )
         ],
       ),

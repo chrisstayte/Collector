@@ -7,6 +7,7 @@ import 'package:collector/global/Global.dart';
 import 'package:collector/main.dart';
 import 'package:collector/models/addItemArguments.dart';
 import 'package:collector/providers/settings_provider.dart';
+import 'package:collector/utilities/extensions.dart';
 import 'package:collector/widgets/permissions_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,9 +35,10 @@ class _CameraScreenState extends State<CameraScreen>
   CameraController? _controller;
   FlashMode _flashMode = FlashMode.auto;
 
-  late String _heading = "";
-  late String _altitude = "";
-  late String _position = "";
+  double _heading = 0.0;
+  double _altitude = 0.0;
+  double _latitude = 0.0;
+  double _longitude = 0.0;
 
   @override
   void initState() {
@@ -123,10 +125,10 @@ class _CameraScreenState extends State<CameraScreen>
                                     '/addItem',
                                     arguments: AddItemArguments(
                                       photo: value,
-                                      latitude: 0.0,
-                                      longitude: 0.0,
-                                      heading: 0.0,
-                                      altitude: 0.0,
+                                      latitude: _latitude,
+                                      longitude: _longitude,
+                                      heading: _heading,
+                                      altitude: _altitude,
                                     ),
                                   ),
                                 );
@@ -179,7 +181,7 @@ class _CameraScreenState extends State<CameraScreen>
                     label: SizedBox(
                       width: 60,
                       child: Text(
-                        _heading,
+                        _heading.cardinalDirection(),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -195,7 +197,8 @@ class _CameraScreenState extends State<CameraScreen>
                       ? context.watch<SettingsProvider>().showPosition
                       : false,
                   child: Chip(
-                    label: Text(_position),
+                    label: Text(
+                        '${_latitude.toStringAsFixed(4)}, ${_longitude.toStringAsFixed(4)}'),
                     avatar: FaIcon(
                       FontAwesomeIcons.locationCrosshairs,
                       color: Global.colors.darkIconColor,
@@ -208,7 +211,7 @@ class _CameraScreenState extends State<CameraScreen>
                       ? context.watch<SettingsProvider>().showAltitude
                       : false,
                   child: Chip(
-                    label: Text(_altitude),
+                    label: Text(_altitude.round().toString()),
                     avatar: FaIcon(
                       FontAwesomeIcons.circleChevronUp,
                       color: Global.colors.darkIconColor,
@@ -366,9 +369,9 @@ class _CameraScreenState extends State<CameraScreen>
           if (position != null) {
             setState(() {
               //_heading = position.heading.round().toString();
-              _altitude = "${position.altitude.round().toString()}m";
-              _position =
-                  "${position.latitude.toStringAsFixed(4)},  ${position.longitude.toStringAsFixed(4)}";
+              _altitude = position.altitude;
+              _latitude = position.latitude;
+              _longitude = position.longitude;
             });
           }
         },
@@ -380,29 +383,28 @@ class _CameraScreenState extends State<CameraScreen>
       _compassStream!.resume();
     } else {
       _compassStream = FlutterCompass.events?.listen((event) {
-        var cardinalDirection = '';
-        if (event.heading != null) {
-          if (event.heading! > 337.5 || event.heading! <= 22.5) {
-            cardinalDirection = 'N';
-          } else if (event.heading! > 22.5 && event.heading! <= 67.5) {
-            cardinalDirection = 'NE';
-          } else if (event.heading! > 67.5 && event.heading! <= 112.5) {
-            cardinalDirection = 'E';
-          } else if (event.heading! > 112.5 && event.heading! <= 157.5) {
-            cardinalDirection = 'SE';
-          } else if (event.heading! > 157.5 && event.heading! <= 202.5) {
-            cardinalDirection = 'S';
-          } else if (event.heading! > 202.5 && event.heading! <= 247.5) {
-            cardinalDirection = 'SW';
-          } else if (event.heading! > 247.5 && event.heading! <= 292.5) {
-            cardinalDirection = 'W';
-          } else if (event.heading! > 292.5 && event.heading! <= 337.5) {
-            cardinalDirection = 'NW';
-          }
-        }
+        // var cardinalDirection = '';
+        // if (event.heading != null) {
+        //   if (event.heading! > 337.5 || event.heading! <= 22.5) {
+        //     cardinalDirection = 'N';
+        //   } else if (event.heading! > 22.5 && event.heading! <= 67.5) {
+        //     cardinalDirection = 'NE';
+        //   } else if (event.heading! > 67.5 && event.heading! <= 112.5) {
+        //     cardinalDirection = 'E';
+        //   } else if (event.heading! > 112.5 && event.heading! <= 157.5) {
+        //     cardinalDirection = 'SE';
+        //   } else if (event.heading! > 157.5 && event.heading! <= 202.5) {
+        //     cardinalDirection = 'S';
+        //   } else if (event.heading! > 202.5 && event.heading! <= 247.5) {
+        //     cardinalDirection = 'SW';
+        //   } else if (event.heading! > 247.5 && event.heading! <= 292.5) {
+        //     cardinalDirection = 'W';
+        //   } else if (event.heading! > 292.5 && event.heading! <= 337.5) {
+        //     cardinalDirection = 'NW';
+        //   }
+        //}
         setState(() {
-          _heading =
-              '${event.headingForCameraMode?.round().toString()} $cardinalDirection';
+          _heading = event.headingForCameraMode ?? 0.0;
         });
       });
     }

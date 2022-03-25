@@ -106,6 +106,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 hintText: 'Description',
                 border: InputBorder.none,
               ),
+              onChanged: (value) => setState(() {
+                _descriptionTextBox = value;
+              }),
             ),
           )
         ]),

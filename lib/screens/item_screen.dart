@@ -1,9 +1,15 @@
 import 'package:collector/global/Global.dart';
+import 'package:collector/models/item.dart';
+import 'package:collector/providers/settings_provider.dart';
+import 'package:collector/utilities/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 class ItemScreen extends StatefulWidget {
-  const ItemScreen({Key? key}) : super(key: key);
+  const ItemScreen({Key? key, required this.item}) : super(key: key);
+  final Item item;
 
   @override
   State<ItemScreen> createState() => _ItemScreenState();
@@ -14,13 +20,17 @@ class _ItemScreenState extends State<ItemScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Title'),
+        title: Text('${widget.item.title}'),
         actions: [
           IconButton(
             onPressed: () => print("edit item"),
             icon: Icon(
               Icons.edit,
             ),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: FaIcon(FontAwesomeIcons.share),
           )
         ],
       ),
@@ -34,7 +44,7 @@ class _ItemScreenState extends State<ItemScreen> {
                 elevation: 5,
                 backgroundColor: Global.colors.lightIconColorDarker,
                 label: Text(
-                  '02/05/2022',
+                  '${widget.item.dateTime.month}/${widget.item.dateTime.day}/${widget.item.dateTime.year}',
                   style: TextStyle(
                     color: Colors.white,
                   ),
@@ -70,7 +80,7 @@ class _ItemScreenState extends State<ItemScreen> {
                           ),
                         ),
                         Text(
-                          '53.2734, 53.2734',
+                          '${widget.item.latitude.toStringAsFixed(4)}, ${widget.item.longitude.toStringAsFixed(4)}',
                         )
                       ],
                     ),
@@ -92,7 +102,7 @@ class _ItemScreenState extends State<ItemScreen> {
                           ),
                         ),
                         Text(
-                          '175N',
+                          '${widget.item.heading.cardinalDirection()}',
                         )
                       ],
                     ),
@@ -113,22 +123,25 @@ class _ItemScreenState extends State<ItemScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          '824 ± 28ft',
-                        )
+                        Text(context.read<SettingsProvider>().useMetricForAlt
+                            ? '${widget.item.altitude.round().toString()} m '
+                            : '${(widget.item.altitude * 3.28084).round().toString()} ft')
                       ],
                     ),
                   ),
                 ),
               ),
-              Flexible(
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Text(
-                        'r 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line i',
+              Visibility(
+                visible: widget.item.description.trim().isNotEmpty,
+                child: Flexible(
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Text(
+                          widget.item.description,
+                        ),
                       ),
                     ),
                   ),

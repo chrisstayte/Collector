@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/models/item.dart';
 import 'package:collector/providers/collector_provider.dart';
+import 'package:collector/widgets/item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -17,11 +18,38 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  late String _searchText = '';
+
+  @override
+  void initState() {
+    _controller.addListener(() {
+      setState(() {
+        _searchText = _controller.text;
+        context.read<CollectorProvider>().searchString = _controller.text;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Collector'),
+        // leading: IconButton(
+        //   onPressed: () => FocusScope.of(context).requestFocus(_focusNode),
+        //   icon: FaIcon(
+        //     FontAwesomeIcons.magnifyingGlass,
+        //   ),
+        // ),
         actions: [
           IconButton(
               onPressed: () => Navigator.pushNamed(context, '/settings'),
@@ -46,11 +74,11 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 64,
               color: Global.colors.lightIconColor,
               child: Card(
-                elevation: 3,
+                elevation: _focusNode.hasFocus ? 3 : 0,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
-                    children: const [
+                    children: [
                       Icon(
                         Icons.search,
                       ),
@@ -59,15 +87,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Expanded(
                         child: TextField(
+                          controller: _controller,
+                          focusNode: _focusNode,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                           ),
+                          onChanged: (value) {
+                            // context.read<CollectorProvider>().searchString =
+                            //     value;
+                          },
                         ),
                       ),
                       Visibility(
-                        visible: true,
-                        child: Icon(
-                          Icons.clear,
+                        visible: _searchText.isNotEmpty,
+                        child: GestureDetector(
+                          onTap: () {
+                            _controller.clear();
+                            _focusNode.unfocus();
+                          },
+                          child: Icon(
+                            Icons.clear,
+                          ),
                         ),
                       )
                     ],
@@ -81,14 +121,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     context.watch<CollectorProvider>().collectorItems.length,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
-                    onTap: () => {},
+                    onLongPress: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text(
+                              'Delete ${context.read<CollectorProvider>().collectorItems[index].title}',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => context
+                                    .read<CollectorProvider>()
+                                    .deleteItem(context
+                                        .read<CollectorProvider>()
+                                        .collectorItems[index])
+                                    .then(
+                                      (value) => Navigator.pop(context),
+                                    ),
+                                child: Text('Yes'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('No'),
+                              )
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/item',
+                      arguments: context
+                          .read<CollectorProvider>()
+                          .collectorItems[index],
+                    ),
                     child: ItemCard(
                       key: Key(context
-                          .watch<CollectorProvider>()
+                          .read<CollectorProvider>()
                           .collectorItems[index]
                           .photoPath),
                       item: context
-                          .watch<CollectorProvider>()
+                          .read<CollectorProvider>()
                           .collectorItems[index],
                     ),
                   );
@@ -109,79 +184,6 @@ class _HomeScreenState extends State<HomeScreen> {
             //   ),
             // ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class ItemCard extends StatelessWidget {
-  final Item item;
-  const ItemCard({Key? key, required this.item}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 135,
-      child: Card(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Container(
-                width: 100,
-                height: 100,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: Global.colors.darkIconColor,
-                ),
-                // child: Image.file(
-                //   File(item.photoPath),
-                //   fit: BoxFit.cover,
-                // ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: SizedBox(
-                  height: 100,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AutoSizeText(
-                        item.title,
-                        maxLines: 2,
-                        maxFontSize: 24,
-                        minFontSize: 12,
-                        style: TextStyle(
-                            color: Global.colors.darkIconColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24),
-                      ),
-                      Text(
-                        item.dateTime.toString(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Global.colors.darkIconColor,
-                        ),
-                      ),
-                      Text(
-                        '${item.latitude}, ${item.longitude}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Global.colors.darkIconColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
