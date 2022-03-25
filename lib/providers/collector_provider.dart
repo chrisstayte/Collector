@@ -90,4 +90,20 @@ class CollectorProvider extends ChangeNotifier {
     notifyListeners();
     await _saveCollectorItems();
   }
+
+  Future<void> addDummyData() async {
+    Item item = Item(
+      title: 'Dummy ${_collectorItems.length + 1}',
+      description: 'Description',
+      photoPath: '',
+      latitude: 0.0,
+      longitude: 0.0,
+      altitude: 0.0,
+      heading: 0.0,
+      dateTime: DateTime.now(),
+    );
+
+    _collectorItems.add(item);
+    notifyListeners();
+  }
 }

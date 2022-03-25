@@ -6,6 +6,7 @@ import 'package:collector/global/Global.dart';
 import 'package:collector/models/item.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/widgets/item_card.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Collector'),
+        title: GestureDetector(
+          onLongPress: () {
+            if (kDebugMode) {
+              context.read<CollectorProvider>().addDummyData();
+            }
+          },
+          child: const Text('Collector'),
+        ),
         // leading: IconButton(
         //   onPressed: () => FocusScope.of(context).requestFocus(_focusNode),
         //   icon: FaIcon(
@@ -74,7 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 64,
               color: Global.colors.lightIconColor,
               child: Card(
-                elevation: _focusNode.hasFocus ? 3 : 0,
+                elevation:
+                    _focusNode.hasFocus || _searchText.isNotEmpty ? 3 : 0,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
@@ -170,19 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            // Expanded(
-            //   child: ListView(
-            //     children: [
-            //       GestureDetector(
-            //         onTap: () => Navigator.pushNamed(
-            //           context,
-            //           '/item',
-            //         ),
-            //         child: ItemCard(),
-            //       )
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),
