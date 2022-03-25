@@ -6,6 +6,7 @@ import 'package:collector/global/Global.dart';
 import 'package:collector/models/item.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,6 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Collector'),
+        actions: [
+          IconButton(
+              onPressed: () => Navigator.pushNamed(context, '/settings'),
+              icon: FaIcon(FontAwesomeIcons.gear))
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(
@@ -131,10 +137,10 @@ class ItemCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                   color: Global.colors.darkIconColor,
                 ),
-                child: Image.file(
-                  File(item.photoPath),
-                  fit: BoxFit.fill,
-                ),
+                // child: Image.file(
+                //   File(item.photoPath),
+                //   fit: BoxFit.cover,
+                // ),
               ),
               const SizedBox(
                 width: 10,

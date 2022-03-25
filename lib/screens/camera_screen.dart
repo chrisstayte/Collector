@@ -117,14 +117,19 @@ class _CameraScreenState extends State<CameraScreen>
                       if (_controller != null) {
                         if (_controller!.value.isInitialized) {
                           if (!_controller!.value.isTakingPicture) {
-                            await _controller?.takePicture().then((value) =>
-                                Navigator.pushNamed(context, '/addItem',
+                            await _controller?.takePicture().then(
+                                  (value) => Navigator.pushNamed(
+                                    context,
+                                    '/addItem',
                                     arguments: AddItemArguments(
-                                        photo: value,
-                                        latitude: 0.0,
-                                        longitude: 0.0,
-                                        heading: 0.0,
-                                        altitude: 0.0)));
+                                      photo: value,
+                                      latitude: 0.0,
+                                      longitude: 0.0,
+                                      heading: 0.0,
+                                      altitude: 0.0,
+                                    ),
+                                  ),
+                                );
                           }
                         }
                       }
@@ -145,7 +150,10 @@ class _CameraScreenState extends State<CameraScreen>
                 ),
                 Expanded(
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await Navigator.pushNamed(context, '/settings');
+                      _setupCamera(force: true);
+                    },
                     icon: Icon(
                       Icons.settings,
                       color: Colors.white,
@@ -163,35 +171,50 @@ class _CameraScreenState extends State<CameraScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Chip(
-                  label: SizedBox(
-                    width: 60,
-                    child: Text(
-                      _heading,
-                      textAlign: TextAlign.center,
+                Visibility(
+                  visible: context.watch<SettingsProvider>().showInfoOnCamera
+                      ? context.watch<SettingsProvider>().showHeading
+                      : false,
+                  child: Chip(
+                    label: SizedBox(
+                      width: 60,
+                      child: Text(
+                        _heading,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
+                    avatar: FaIcon(
+                      FontAwesomeIcons.solidCompass,
+                      color: Global.colors.darkIconColor,
+                    ),
+                    backgroundColor: Global.colors.lightIconColor,
                   ),
-                  avatar: FaIcon(
-                    FontAwesomeIcons.solidCompass,
-                    color: Global.colors.darkIconColor,
-                  ),
-                  backgroundColor: Global.colors.lightIconColor,
                 ),
-                Chip(
-                  label: Text(_position),
-                  avatar: FaIcon(
-                    FontAwesomeIcons.locationCrosshairs,
-                    color: Global.colors.darkIconColor,
+                Visibility(
+                  visible: context.watch<SettingsProvider>().showInfoOnCamera
+                      ? context.watch<SettingsProvider>().showPosition
+                      : false,
+                  child: Chip(
+                    label: Text(_position),
+                    avatar: FaIcon(
+                      FontAwesomeIcons.locationCrosshairs,
+                      color: Global.colors.darkIconColor,
+                    ),
+                    backgroundColor: Global.colors.lightIconColor,
                   ),
-                  backgroundColor: Global.colors.lightIconColor,
                 ),
-                Chip(
-                  label: Text(_altitude),
-                  avatar: FaIcon(
-                    FontAwesomeIcons.circleArrowUp,
-                    color: Global.colors.darkIconColor,
+                Visibility(
+                  visible: context.watch<SettingsProvider>().showInfoOnCamera
+                      ? context.watch<SettingsProvider>().showAltitude
+                      : false,
+                  child: Chip(
+                    label: Text(_altitude),
+                    avatar: FaIcon(
+                      FontAwesomeIcons.circleChevronUp,
+                      color: Global.colors.darkIconColor,
+                    ),
+                    backgroundColor: Global.colors.lightIconColor,
                   ),
-                  backgroundColor: Global.colors.lightIconColor,
                 ),
               ],
             ),
@@ -307,8 +330,8 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
-  Future<void> _setupCamera() async {
-    if (_controller != null) return;
+  Future<void> _setupCamera({bool force = false}) async {
+    if (_controller != null && !force) return;
 
     try {
       _cameras = await availableCameras();
@@ -317,7 +340,7 @@ class _CameraScreenState extends State<CameraScreen>
       }
       _controller = CameraController(
         _cameras[0],
-        ResolutionPreset.high,
+        context.read<SettingsProvider>().resolutionPreset,
         enableAudio: false,
         imageFormatGroup: ImageFormatGroup.yuv420,
       );

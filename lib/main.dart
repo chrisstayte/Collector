@@ -7,6 +7,7 @@ import 'package:collector/screens/add_item_screen.dart';
 import 'package:collector/screens/camera_screen.dart';
 import 'package:collector/screens/home_screen.dart';
 import 'package:collector/screens/item_screen.dart';
+import 'package:collector/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       showSemanticsDebugger: false,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: Global.colors.lightIconColor,
         appBarTheme: AppBarTheme(
@@ -78,6 +80,11 @@ class MyApp extends StatelessWidget {
             return PageTransition(
               child: ItemScreen(),
               type: PageTransitionType.rightToLeft,
+            );
+          case '/settings':
+            return PageTransition(
+              child: SettingsScreen(),
+              type: PageTransitionType.bottomToTop,
             );
         }
         return null;
