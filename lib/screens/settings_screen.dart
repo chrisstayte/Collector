@@ -106,7 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text(
-              '   Show Heading',
+              '      Show Heading',
             ),
             trailing: Switch(
               onChanged: context.watch<SettingsProvider>().showInfoOnCamera
@@ -119,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text(
-              '   Show Position',
+              '      Show Position',
             ),
             trailing: Switch(
               onChanged: context.watch<SettingsProvider>().showInfoOnCamera
@@ -132,7 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text(
-              '   Show Altitude',
+              '      Show Altitude',
             ),
             trailing: Switch(
               onChanged: context.watch<SettingsProvider>().showInfoOnCamera

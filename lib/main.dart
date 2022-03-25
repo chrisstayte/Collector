@@ -8,6 +8,7 @@ import 'package:collector/screens/camera_screen.dart';
 import 'package:collector/screens/home_screen.dart';
 import 'package:collector/screens/item_screen.dart';
 import 'package:collector/screens/settings_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       showSemanticsDebugger: false,
       debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.light,
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: Global.colors.lightIconColor,
         appBarTheme: AppBarTheme(
@@ -55,6 +57,43 @@ class MyApp extends StatelessWidget {
             backgroundColor: Global.colors.darkIconColor),
         iconTheme: IconThemeData(
           color: Global.colors.darkIconColor,
+        ),
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          backgroundColor: Global.colors.darkIconColor,
+          foregroundColor: Global.colors.lightIconColor,
+          actionsIconTheme: IconThemeData(
+            color: Global.colors.darkIconColorLighter,
+          ),
+          iconTheme: IconThemeData(
+            //color: Color(0XFF536372),
+            color: Global.colors.darkIconColorLighter,
+          ),
+          titleTextStyle: TextStyle(
+            color: Global.colors.lightIconColor,
+            fontFamily: 'DiarioDeAndy',
+            fontSize: 26,
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            primary: Global.colors.darkIconColorLighter,
+          ),
+        ),
+        scaffoldBackgroundColor: Global.colors.darkIconColor,
+        cupertinoOverrideTheme: const NoDefaultCupertinoThemeData(
+          textTheme:
+              CupertinoTextThemeData(primaryColor: CupertinoColors.white),
+        ),
+        switchTheme: SwitchThemeData(
+          thumbColor: MaterialStateProperty.all(
+            Global.colors.lightIconColor,
+          ),
+          trackColor: MaterialStateProperty.all(
+            Global.colors.lightIconColorDarker,
+          ),
         ),
       ),
       initialRoute: '/',
