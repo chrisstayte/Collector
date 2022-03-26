@@ -6,6 +6,7 @@ import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/screens/add_item_screen.dart';
 import 'package:collector/screens/camera_screen.dart';
+import 'package:collector/screens/edit_item_screen.dart';
 import 'package:collector/screens/home_screen.dart';
 import 'package:collector/screens/item_screen.dart';
 import 'package:collector/screens/settings_screen.dart';
@@ -124,6 +125,11 @@ class MyApp extends StatelessWidget {
               ),
               type: PageTransitionType.rightToLeft,
             );
+          case '/editItem':
+            final item = settings.arguments as Item;
+            return PageTransition(
+                child: EditItemScreen(item: item),
+                type: PageTransitionType.rightToLeft);
           case '/settings':
             return PageTransition(
               child: SettingsScreen(),

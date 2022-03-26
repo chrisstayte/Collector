@@ -4,6 +4,7 @@ import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/utilities/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -20,18 +21,18 @@ class _ItemScreenState extends State<ItemScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.item.title}'),
+        title: Text(widget.item.title),
         actions: [
           IconButton(
-            onPressed: () => print("edit item"),
+            onPressed: () => Navigator.pushNamed(
+              context,
+              '/editItem',
+              arguments: widget.item,
+            ).then((value) => setState(() => {})),
             icon: Icon(
               Icons.edit,
             ),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: FaIcon(FontAwesomeIcons.share),
-          )
         ],
       ),
       body: SafeArea(
@@ -55,7 +56,7 @@ class _ItemScreenState extends State<ItemScreen> {
                   color: Colors.transparent,
                   elevation: 5,
                   child: Container(
-                    height: 350,
+                    height: 290,
                     width: 250,
                     color: Colors.blue,
                     child: Center(
@@ -65,7 +66,50 @@ class _ItemScreenState extends State<ItemScreen> {
                 ),
               ),
               SizedBox(height: 15),
-              Container(
+              // SizedBox(
+              //   height: 44,
+              //   child: Row(
+              //     children: [
+              //       Expanded(
+              //         child: Padding(
+              //           padding: EdgeInsets.only(right: 10),
+              //           child: GestureDetector(
+              //             onTap: () async {
+              //               await sendSMS(
+              //                 message: '${widget.item.title}',
+              //                 recipients: [],
+              //               );
+              //             },
+              //             child: Card(
+              //               color: Global.colors.lightIconColorDarker,
+              //               child: Center(
+              //                 child: FaIcon(
+              //                   FontAwesomeIcons.commentSms,
+              //                   color: Colors.white,
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       Expanded(
+              //         child: Padding(
+              //           padding: EdgeInsets.only(left: 10),
+              //           child: Card(
+              //             color: Global.colors.lightIconColorDarker,
+              //             child: Center(
+              //               child: FaIcon(
+              //                 FontAwesomeIcons.envelope,
+              //                 color: Colors.white,
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       )
+              //     ],
+              //   ),
+              // ),
+              SizedBox(
                 height: 44,
                 child: Card(
                   child: Padding(
@@ -87,50 +131,61 @@ class _ItemScreenState extends State<ItemScreen> {
                   ),
                 ),
               ),
-              Container(
-                height: 44,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Heading',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 44,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Heading',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '${widget.item.heading.cardinalDirection()}',
+                              )
+                            ],
                           ),
                         ),
-                        Text(
-                          '${widget.item.heading.cardinalDirection()}',
-                        )
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Container(
-                height: 44,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Altitude',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: SizedBox(
+                      height: 44,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Altitude',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(context
+                                      .read<SettingsProvider>()
+                                      .useMetricForAlt
+                                  ? '${widget.item.altitude.round().toString()} m '
+                                  : '${(widget.item.altitude * 3.28084).round().toString()} ft')
+                            ],
                           ),
                         ),
-                        Text(context.read<SettingsProvider>().useMetricForAlt
-                            ? '${widget.item.altitude.round().toString()} m '
-                            : '${(widget.item.altitude * 3.28084).round().toString()} ft')
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
+
               Visibility(
                 visible: widget.item.description.trim().isNotEmpty,
                 child: Flexible(

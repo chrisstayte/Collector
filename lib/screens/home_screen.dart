@@ -1,9 +1,6 @@
 import 'dart:io';
 
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
-import 'package:collector/models/item.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/widgets/item_card.dart';
 import 'package:flutter/foundation.dart';
@@ -52,12 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: const Text('Collector'),
         ),
-        // leading: IconButton(
-        //   onPressed: () => FocusScope.of(context).requestFocus(_focusNode),
-        //   icon: FaIcon(
-        //     FontAwesomeIcons.magnifyingGlass,
-        //   ),
-        // ),
         actions: [
           IconButton(
               onPressed: () => Navigator.pushNamed(context, '/settings'),

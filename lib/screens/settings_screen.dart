@@ -243,8 +243,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 path: 'www.github.com/ChrisStayte/Collector',
               );
               final String url = params.toString();
+
               if (await canLaunch(url)) {
-                await launch(url);
+                await launch(url).catchError((error) {
+                  print(error);
+                  return false;
+                });
               }
             },
           ),

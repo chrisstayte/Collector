@@ -22,7 +22,12 @@ class CollectorProvider extends ChangeNotifier {
       : UnmodifiableListView(
           _collectorItems.where(
             (item) =>
-                item.title.toLowerCase().contains(_searchString.toLowerCase()),
+                item.title.toLowerCase().contains(
+                      _searchString.toLowerCase(),
+                    ) ||
+                item.description.toLowerCase().contains(
+                      _searchString.toLowerCase(),
+                    ),
           ),
         );
 
@@ -91,10 +96,17 @@ class CollectorProvider extends ChangeNotifier {
     await _saveCollectorItems();
   }
 
+  Future<void> editItem(Item item) async {
+    if (_collectorItems.contains(item)) {
+      notifyListeners();
+      _saveCollectorItems();
+    }
+  }
+
   Future<void> addDummyData() async {
     Item item = Item(
       title: 'Dummy ${_collectorItems.length + 1}',
-      description: 'Description',
+      description: 'Description Text ${_collectorItems.length + 1}',
       photoPath: '',
       latitude: 0.0,
       longitude: 0.0,
