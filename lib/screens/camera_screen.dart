@@ -10,6 +10,7 @@ import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/utilities/extensions.dart';
 import 'package:collector/widgets/permissions_dialog.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_compass/flutter_compass.dart';
@@ -35,6 +36,8 @@ class _CameraScreenState extends State<CameraScreen>
   StreamSubscription<CompassEvent>? _compassStream;
   CameraController? _controller;
   FlashMode _flashMode = FlashMode.auto;
+
+  bool _screenshotMode = true;
 
   double _heading = 0.0;
   double _altitude = 0.0;
@@ -188,9 +191,6 @@ class _CameraScreenState extends State<CameraScreen>
                     ),
                     avatar: FaIcon(
                       FontAwesomeIcons.solidCompass,
-                      color: context.watch<SettingsProvider>().isDarkMode
-                          ? Global.colors.lightIconColor
-                          : Global.colors.darkIconColor,
                     ),
                   ),
                 ),
@@ -199,13 +199,11 @@ class _CameraScreenState extends State<CameraScreen>
                       ? context.watch<SettingsProvider>().showPosition
                       : false,
                   child: Chip(
-                    label: Text(
-                        '${_latitude.toStringAsFixed(5)}, ${_longitude.toStringAsFixed(5)}'),
+                    label: Text(_screenshotMode && kDebugMode
+                        ? '26.357891,127.78378'
+                        : '${_latitude.toStringAsFixed(5)}, ${_longitude.toStringAsFixed(5)}'),
                     avatar: FaIcon(
                       FontAwesomeIcons.locationCrosshairs,
-                      color: context.watch<SettingsProvider>().isDarkMode
-                          ? Global.colors.lightIconColor
-                          : Global.colors.darkIconColor,
                     ),
                   ),
                 ),
@@ -219,9 +217,6 @@ class _CameraScreenState extends State<CameraScreen>
                         : '${(_altitude * 3.28084).round().toString()} ft'),
                     avatar: FaIcon(
                       FontAwesomeIcons.circleChevronUp,
-                      color: context.watch<SettingsProvider>().isDarkMode
-                          ? Global.colors.lightIconColor
-                          : Global.colors.darkIconColor,
                     ),
                   ),
                 ),

@@ -1,17 +1,22 @@
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/main.dart';
 import 'package:collector/models/item.dart';
+import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/utilities/extensions.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ItemScreen extends StatefulWidget {
   const ItemScreen({Key? key, required this.item}) : super(key: key);
@@ -22,21 +27,111 @@ class ItemScreen extends StatefulWidget {
 }
 
 class _ItemScreenState extends State<ItemScreen> {
+  bool _screenshotMode = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.item.title),
+        title: AutoSizeText(
+          widget.item.title,
+          maxLines: 1,
+          minFontSize: 14,
+        ),
         actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(
-              context,
-              '/editItem',
-              arguments: widget.item,
-            ).then((value) => setState(() => {})),
-            icon: Icon(
-              Icons.edit,
-            ),
+          PopupMenuButton<int>(
+            icon: const Icon(Icons.more_vert),
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 1,
+                child: ListTile(
+                  leading: Icon(Icons.textsms),
+                  title: Text('Share SMS'),
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: ListTile(
+                  leading: Icon(Icons.email),
+                  title: Text('Share Email'),
+                ),
+              ),
+              PopupMenuItem(
+                value: 3,
+                child: ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('Edit'),
+                ),
+              ),
+              PopupMenuItem(
+                value: 4,
+                child: ListTile(
+                  leading: Icon(Icons.delete),
+                  title: Text('Delete'),
+                ),
+              )
+            ],
+            onSelected: (value) async {
+              switch (value) {
+                case 1:
+                  await sendSMS(
+                    message:
+                        '${widget.item.title}\n${widget.item.dateTime}\nHeading: ${widget.item.heading.cardinalDirection()}\nPosition: ${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}\nAltitude: ${context.read<SettingsProvider>().useMetricForAlt ? '${widget.item.altitude.round().toString()} m ' : '${(widget.item.altitude * 3.28084).round().toString()} ft'}',
+                    recipients: [],
+                  );
+                  break;
+                case 2:
+                  final Uri params = Uri(
+                    scheme: 'mailto',
+                    query:
+                        'subject= Collector - ${widget.item.title}&body=${widget.item.title}\n${widget.item.dateTime}\nHeading: ${widget.item.heading.cardinalDirection()}\nPosition: ${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}\nAltitude: ${context.read<SettingsProvider>().useMetricForAlt ? '${widget.item.altitude.round().toString()} m ' : '${(widget.item.altitude * 3.28084).round().toString()} ft'}',
+                  );
+
+                  final String url = params.toString();
+                  if (await canLaunch(url)) {
+                    await (launch(url));
+                  }
+                  break;
+                case 3:
+                  await Navigator.pushNamed(
+                    context,
+                    '/editItem',
+                    arguments: widget.item,
+                  ).then(
+                    (value) => setState(
+                      () => {},
+                    ),
+                  );
+                  break;
+                case 4:
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text(
+                          'Delete ${widget.item.title}',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => context
+                                .read<CollectorProvider>()
+                                .deleteItem(widget.item)
+                                .then(
+                                  (value) => Navigator.pushNamedAndRemoveUntil(
+                                      context, '/', (_) => false),
+                                ),
+                            child: Text('Yes'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('No'),
+                          )
+                        ],
+                      );
+                    },
+                  );
+                  break;
+              }
+            },
           ),
         ],
       ),
@@ -46,16 +141,33 @@ class _ItemScreenState extends State<ItemScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Chip(
-                elevation: 5,
-                backgroundColor: Global.colors.lightIconColorDarker,
-                label: Text(
-                  '${widget.item.dateTime.month}/${widget.item.dateTime.day}/${widget.item.dateTime.year}',
-                  style: TextStyle(
-                    color: Colors.white,
+              Wrap(
+                spacing: 10,
+                alignment: WrapAlignment.center,
+                children: [
+                  Chip(
+                    elevation: 5,
+                    backgroundColor: Global.colors.lightIconColorDarker,
+                    label: Text(
+                      '${widget.item.dateTime.month}/${widget.item.dateTime.day}/${widget.item.dateTime.year}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
+                  Chip(
+                    elevation: 5,
+                    backgroundColor: Global.colors.lightIconColorDarker,
+                    label: Text(
+                      '${DateFormat('hh:mm a').format(widget.item.dateTime)}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+
               Center(
                 child: SizedBox(
                   height: 400,
@@ -131,7 +243,9 @@ class _ItemScreenState extends State<ItemScreen> {
                           ),
                         ),
                         Text(
-                          '${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}',
+                          _screenshotMode && kDebugMode
+                              ? '26.357891,127.78378'
+                              : '${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}',
                         )
                       ],
                     ),
@@ -192,7 +306,6 @@ class _ItemScreenState extends State<ItemScreen> {
                   ),
                 ],
               ),
-
               Visibility(
                 visible: widget.item.description.trim().isNotEmpty,
                 child: Flexible(

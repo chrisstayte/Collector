@@ -293,6 +293,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: FaIcon(FontAwesomeIcons.circleInfo),
             title: Text('${_packageInfo.version}'),
+          ),
+          ListTile(
+            leading: Icon(Icons.flutter_dash_outlined),
+            title: Text('Made with flutter!'),
           )
         ],
       ),

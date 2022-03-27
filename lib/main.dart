@@ -1,4 +1,3 @@
-import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/models/add_item_arguments.dart';
 import 'package:collector/models/item.dart';
@@ -10,7 +9,6 @@ import 'package:collector/screens/edit_item_screen.dart';
 import 'package:collector/screens/home_screen.dart';
 import 'package:collector/screens/item_screen.dart';
 import 'package:collector/screens/settings_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
