@@ -70,6 +70,7 @@ class CollectorProvider extends ChangeNotifier {
         print(e.toString());
       }
     }
+    _sortItems();
     notifyListeners();
   }
 
@@ -100,6 +101,7 @@ class CollectorProvider extends ChangeNotifier {
   Future<void> editItem(Item item) async {
     if (_collectorItems.contains(item)) {
       notifyListeners();
+      _sortItems();
       _saveCollectorItems();
     }
   }
@@ -118,5 +120,11 @@ class CollectorProvider extends ChangeNotifier {
 
     _collectorItems.add(item);
     notifyListeners();
+  }
+
+  Future<void> _sortItems() async {
+    _collectorItems.sort((a, b) {
+      return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+    });
   }
 }

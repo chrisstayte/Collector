@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:collector/models/sorting_method.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,6 +25,11 @@ class SettingsProvider extends ChangeNotifier {
     _showPosition = prefs.getBool('showPosition') ?? true;
     _showAltitude = prefs.getBool('showAltitude') ?? true;
     _useMetricForAlt = prefs.getBool('useMetricForAlt') ?? true;
+    _stayOnCameraAfterNewItem =
+        prefs.getBool('stayOnCameraAfterNewItem') ?? true;
+
+    _sortingMethod = SortingMethod.values.byName(
+        prefs.getString('sortingMethod') ?? SortingMethod.dateAscending.name);
 
     notifyListeners();
   }
@@ -88,6 +94,24 @@ class SettingsProvider extends ChangeNotifier {
   void setUseMetricForAlt(bool value) async {
     _useMetricForAlt = value;
     await prefs.setBool('useMetricForAlt', value);
+    notifyListeners();
+  }
+
+  bool _stayOnCameraAfterNewItem = true;
+  bool get stayOnCameraAfterNewItem => _stayOnCameraAfterNewItem;
+
+  void setStayOnCameraAfterNewItem(bool value) async {
+    _stayOnCameraAfterNewItem = value;
+    await prefs.setBool('stayOnCameraAfterNewItem', value);
+    notifyListeners();
+  }
+
+  SortingMethod _sortingMethod = SortingMethod.dateAscending;
+  SortingMethod get sortingMethod => _sortingMethod;
+
+  void setSortingMethod(SortingMethod value) async {
+    _sortingMethod = value;
+    await prefs.setString('sortingMethod', value.name);
     notifyListeners();
   }
 }

@@ -5,6 +5,7 @@ import 'package:collector/global/Global.dart';
 import 'package:collector/models/item.dart';
 import 'package:collector/models/addItemArguments.dart';
 import 'package:collector/providers/collector_provider.dart';
+import 'package:collector/providers/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -38,7 +39,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
         automaticallyImplyLeading: false,
         title: Text('Add Item'),
         leading: IconButton(
-          icon: FaIcon(FontAwesomeIcons.ban),
+          icon: Icon(Icons.cancel),
           onPressed: () =>
               File(widget.newItemArguments.photo.path).delete().then(
                     (value) => Navigator.pop(context),
@@ -71,7 +72,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
                 context.read<CollectorProvider>().addItem(item);
 
-                Navigator.pop(context);
+                if (context.read<SettingsProvider>().stayOnCameraAfterNewItem) {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+                }
               } else {
                 var snackBar = const SnackBar(
                   content: Text('Title required'),

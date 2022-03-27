@@ -52,6 +52,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           ListTile(
             title: Text(
+              'General',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+          ),
+          ListTile(
+            title: Text('Stay On Camera After New Item'),
+            trailing: Switch(
+              onChanged: (value) {
+                context
+                    .read<SettingsProvider>()
+                    .setStayOnCameraAfterNewItem(value);
+              },
+              value: context.watch<SettingsProvider>().stayOnCameraAfterNewItem,
+            ),
+          ),
+          ListTile(
+            title: Text(
               'Camera',
               style: Theme.of(context).textTheme.headline5,
             ),

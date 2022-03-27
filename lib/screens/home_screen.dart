@@ -51,6 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: const Text('Collector'),
         ),
+        leading: DropdownButton(
+          onChanged: (value) {},
+          items: [
+            DropdownMenuItem<String>(
+              child: Icon(Icons.sort_by_alpha),
+            )
+          ],
+        ),
         actions: [
           IconButton(
               onPressed: () => Navigator.pushNamed(context, '/settings'),
