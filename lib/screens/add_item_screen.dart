@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/models/item.dart';
-import 'package:collector/models/addItemArguments.dart';
+import 'package:collector/models/add_item_arguments.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:flutter/material.dart';

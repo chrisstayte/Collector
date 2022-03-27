@@ -108,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               height: 64,
-              color: Global.colors.lightIconColor,
               child: Card(
                 elevation:
                     _focusNode.hasFocus || _searchText.isNotEmpty ? 3 : 0,
@@ -129,10 +128,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                           ),
-                          onChanged: (value) {
-                            // context.read<CollectorProvider>().searchString =
-                            //     value;
-                          },
                         ),
                       ),
                       Visibility(

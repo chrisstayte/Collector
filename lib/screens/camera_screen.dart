@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/main.dart';
-import 'package:collector/models/addItemArguments.dart';
+import 'package:collector/models/add_item_arguments.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/utilities/extensions.dart';
 import 'package:collector/widgets/permissions_dialog.dart';
@@ -188,9 +188,10 @@ class _CameraScreenState extends State<CameraScreen>
                     ),
                     avatar: FaIcon(
                       FontAwesomeIcons.solidCompass,
-                      color: Global.colors.darkIconColor,
+                      color: context.watch<SettingsProvider>().isDarkMode
+                          ? Global.colors.lightIconColor
+                          : Global.colors.darkIconColor,
                     ),
-                    backgroundColor: Global.colors.lightIconColor,
                   ),
                 ),
                 Visibility(
@@ -202,9 +203,10 @@ class _CameraScreenState extends State<CameraScreen>
                         '${_latitude.toStringAsFixed(5)}, ${_longitude.toStringAsFixed(5)}'),
                     avatar: FaIcon(
                       FontAwesomeIcons.locationCrosshairs,
-                      color: Global.colors.darkIconColor,
+                      color: context.watch<SettingsProvider>().isDarkMode
+                          ? Global.colors.lightIconColor
+                          : Global.colors.darkIconColor,
                     ),
-                    backgroundColor: Global.colors.lightIconColor,
                   ),
                 ),
                 Visibility(
@@ -217,9 +219,10 @@ class _CameraScreenState extends State<CameraScreen>
                         : '${(_altitude * 3.28084).round().toString()} ft'),
                     avatar: FaIcon(
                       FontAwesomeIcons.circleChevronUp,
-                      color: Global.colors.darkIconColor,
+                      color: context.watch<SettingsProvider>().isDarkMode
+                          ? Global.colors.lightIconColor
+                          : Global.colors.darkIconColor,
                     ),
-                    backgroundColor: Global.colors.lightIconColor,
                   ),
                 ),
               ],

@@ -50,22 +50,18 @@ class ItemCard extends StatelessWidget {
                         maxFontSize: 24,
                         minFontSize: 12,
                         style: TextStyle(
-                            color: Global.colors.darkIconColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24),
+                            fontWeight: FontWeight.bold, fontSize: 24),
                       ),
                       Text(
                         item.dateTime.toString(),
                         style: TextStyle(
                           fontSize: 14,
-                          color: Global.colors.darkIconColor,
                         ),
                       ),
                       Text(
                         '${item.latitude.toStringAsFixed(5)}, ${item.longitude.toStringAsFixed(5)}',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Global.colors.darkIconColor,
                         ),
                       ),
                     ],

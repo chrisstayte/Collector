@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:collector/global/Global.dart';
-import 'package:collector/models/addItemArguments.dart';
+import 'package:collector/models/add_item_arguments.dart';
 import 'package:collector/models/item.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/providers/settings_provider.dart';
@@ -68,44 +68,64 @@ class MyApp extends StatelessWidget {
         iconTheme: IconThemeData(
           color: Global.colors.darkIconColor,
         ),
+        chipTheme: ChipThemeData(
+          backgroundColor: Global.colors.lightIconColor,
+        ),
       ),
       darkTheme: ThemeData.dark().copyWith(
-        appBarTheme: AppBarTheme(
-          elevation: 0,
-          backgroundColor: Global.colors.darkIconColor,
-          foregroundColor: Global.colors.lightIconColor,
-          actionsIconTheme: IconThemeData(
-            color: Global.colors.darkIconColorLighter,
-          ),
-          iconTheme: IconThemeData(
-            //color: Color(0XFF536372),
-            color: Global.colors.darkIconColorLighter,
-          ),
-          titleTextStyle: TextStyle(
-            color: Global.colors.lightIconColor,
-            fontFamily: 'DiarioDeAndy',
-            fontSize: 26,
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            primary: Global.colors.darkIconColorLighter,
-          ),
-        ),
         scaffoldBackgroundColor: Global.colors.darkIconColor,
-        cupertinoOverrideTheme: const NoDefaultCupertinoThemeData(
-          textTheme:
-              CupertinoTextThemeData(primaryColor: CupertinoColors.white),
+        appBarTheme: AppBarTheme(
+          color: Global.colors.darkIconColor,
+          titleTextStyle: Theme.of(context).textTheme.headline5?.copyWith(
+                color: Global.colors.lightIconColor,
+              ),
+          elevation: 0,
+          iconTheme: IconThemeData(
+            color: Global.colors.darkIconColorLighter,
+          ),
         ),
-        switchTheme: SwitchThemeData(
-          thumbColor: MaterialStateProperty.all(
-            Global.colors.lightIconColor,
-          ),
-          trackColor: MaterialStateProperty.all(
-            Global.colors.lightIconColorDarker,
-          ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+            backgroundColor: Global.colors.lightIconColor),
+        iconTheme: IconThemeData(
+          color: Global.colors.lightIconColor,
+        ),
+        chipTheme: ChipThemeData(
+          backgroundColor: Global.colors.darkIconColor,
         ),
       ),
+      // darkTheme: ThemeData.dark().copyWith(
+      //   appBarTheme: AppBarTheme(
+      //     elevation: 0,
+      //     backgroundColor: Global.colors.darkIconColor,
+      //     foregroundColor: Global.colors.lightIconColor,
+      //     actionsIconTheme: IconThemeData(
+      //       color: Global.colors.darkIconColorLighter,
+      //     ),
+      //     iconTheme: IconThemeData(
+      //       //color: Color(0XFF536372),
+      //       color: Global.colors.darkIconColorLighter,
+      //     ),
+      //     titleTextStyle: TextStyle(
+      //       color: Global.colors.lightIconColor,
+      //       fontFamily: 'DiarioDeAndy',
+      //       fontSize: 26,
+      //     ),
+      //   ),
+      //   textButtonTheme: TextButtonThemeData(
+      //     style: TextButton.styleFrom(
+      //       primary: Global.colors.darkIconColorLighter,
+      //     ),
+      //   ),
+      //   scaffoldBackgroundColor: Global.colors.darkIconColor,
+      //   switchTheme: SwitchThemeData(
+      //     thumbColor: MaterialStateProperty.all(
+      //       Global.colors.lightIconColor,
+      //     ),
+      //     trackColor: MaterialStateProperty.all(
+      //       Global.colors.lightIconColorDarker,
+      //     ),
+      //   ),
+      // ),
       initialRoute: '/',
       onGenerateRoute: (settings) {
         switch (settings.name) {

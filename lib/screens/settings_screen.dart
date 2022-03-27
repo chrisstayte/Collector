@@ -87,9 +87,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: SizedBox(
               width: 225,
               child: CupertinoSegmentedControl(
-                borderColor: Global.colors.darkIconColor,
-                unselectedColor: Global.colors.lightIconColor,
-                selectedColor: Global.colors.darkIconColor,
+                borderColor: context.watch<SettingsProvider>().isDarkMode
+                    ? Global.colors.lightIconColor
+                    : Global.colors.darkIconColor,
+                unselectedColor: context.watch<SettingsProvider>().isDarkMode
+                    ? Global.colors.darkIconColor
+                    : Global.colors.lightIconColor,
+                selectedColor: context.watch<SettingsProvider>().isDarkMode
+                    ? Global.colors.lightIconColor
+                    : Global.colors.darkIconColor,
                 onValueChanged: (value) {
                   ResolutionPreset preset =
                       ResolutionPreset.values.byName(value!.toString());
@@ -111,9 +117,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: SizedBox(
               width: 225,
               child: CupertinoSegmentedControl(
-                borderColor: Global.colors.darkIconColor,
-                unselectedColor: Global.colors.lightIconColor,
-                selectedColor: Global.colors.darkIconColor,
+                borderColor: context.watch<SettingsProvider>().isDarkMode
+                    ? Global.colors.lightIconColor
+                    : Global.colors.darkIconColor,
+                unselectedColor: context.watch<SettingsProvider>().isDarkMode
+                    ? Global.colors.darkIconColor
+                    : Global.colors.lightIconColor,
+                selectedColor: context.watch<SettingsProvider>().isDarkMode
+                    ? Global.colors.lightIconColor
+                    : Global.colors.darkIconColor,
                 onValueChanged: (value) {
                   FlashMode flashMode =
                       FlashMode.values.byName(value!.toString());
