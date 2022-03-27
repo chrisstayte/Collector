@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:collector/global/Global.dart';
 import 'package:collector/main.dart';
+import 'package:collector/models/sorting_method.dart';
 import 'package:collector/providers/collector_provider.dart';
+import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/widgets/item_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: GestureDetector(
           onLongPress: () {
             if (kDebugMode) {
@@ -51,13 +54,37 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: const Text('Collector'),
         ),
-        leading: DropdownButton(
-          onChanged: (value) {},
-          items: [
-            DropdownMenuItem<String>(
-              child: Icon(Icons.sort_by_alpha),
-            )
-          ],
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: DropdownButton(
+            value: context.watch<SettingsProvider>().sortingMethod,
+            onChanged: (value) {
+              context
+                  .read<SettingsProvider>()
+                  .setSortingMethod(value as SortingMethod);
+              context
+                  .read<CollectorProvider>()
+                  .sortItems(value as SortingMethod);
+            },
+            items: const [
+              DropdownMenuItem<SortingMethod>(
+                value: SortingMethod.dateAscending,
+                child: FaIcon(FontAwesomeIcons.arrowDown19),
+              ),
+              DropdownMenuItem<SortingMethod>(
+                value: SortingMethod.dateDescending,
+                child: FaIcon(FontAwesomeIcons.arrowDown91),
+              ),
+              DropdownMenuItem<SortingMethod>(
+                value: SortingMethod.alphaAscending,
+                child: FaIcon(FontAwesomeIcons.arrowDownAZ),
+              ),
+              DropdownMenuItem<SortingMethod>(
+                value: SortingMethod.alphaDescending,
+                child: FaIcon(FontAwesomeIcons.arrowDownZA),
+              ),
+            ],
+          ),
         ),
         actions: [
           IconButton(

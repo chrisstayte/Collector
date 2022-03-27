@@ -57,6 +57,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
+            title: Text('Dark Mode'),
+            trailing: Switch(
+              onChanged: (value) {
+                context.read<SettingsProvider>().setIsDarkMode(value);
+              },
+              value: context.watch<SettingsProvider>().isDarkMode,
+            ),
+          ),
+          ListTile(
             title: Text('Stay On Camera After New Item'),
             trailing: Switch(
               onChanged: (value) {

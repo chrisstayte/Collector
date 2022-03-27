@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collector/models/item.dart';
+import 'package:collector/models/sorting_method.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -70,7 +71,6 @@ class CollectorProvider extends ChangeNotifier {
         print(e.toString());
       }
     }
-    _sortItems();
     notifyListeners();
   }
 
@@ -82,7 +82,6 @@ class CollectorProvider extends ChangeNotifier {
 
   Future<void> addItem(Item item) async {
     _collectorItems.insert(0, item);
-    notifyListeners();
     await _saveCollectorItems();
   }
 
@@ -101,7 +100,6 @@ class CollectorProvider extends ChangeNotifier {
   Future<void> editItem(Item item) async {
     if (_collectorItems.contains(item)) {
       notifyListeners();
-      _sortItems();
       _saveCollectorItems();
     }
   }
@@ -122,9 +120,24 @@ class CollectorProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _sortItems() async {
-    _collectorItems.sort((a, b) {
-      return a.title.toLowerCase().compareTo(b.title.toLowerCase());
-    });
+  Future<void> sortItems(SortingMethod sortingMethod) async {
+    switch (sortingMethod) {
+      case SortingMethod.alphaAscending:
+        _collectorItems.sort(
+            (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+        break;
+      case SortingMethod.alphaDescending:
+        _collectorItems.sort(
+            (a, b) => b.title.toLowerCase().compareTo(a.title.toLowerCase()));
+        break;
+      case SortingMethod.dateAscending:
+        _collectorItems.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+        break;
+      case SortingMethod.dateDescending:
+        _collectorItems.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+        break;
+    }
+    notifyListeners();
+    await _saveCollectorItems();
   }
 }

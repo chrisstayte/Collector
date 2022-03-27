@@ -70,7 +70,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   heading: widget.newItemArguments.heading,
                 );
 
-                context.read<CollectorProvider>().addItem(item);
+                context.read<CollectorProvider>()
+                  ..addItem(item)
+                  ..sortItems(
+                    context.read<SettingsProvider>().sortingMethod,
+                  );
 
                 if (context.read<SettingsProvider>().stayOnCameraAfterNewItem) {
                   Navigator.pop(context);

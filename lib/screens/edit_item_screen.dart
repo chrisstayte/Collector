@@ -1,6 +1,7 @@
 import 'package:collector/global/Global.dart';
 import 'package:collector/models/item.dart';
 import 'package:collector/providers/collector_provider.dart';
+import 'package:collector/providers/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -43,9 +44,13 @@ class _EditItemScreenState extends State<EditItemScreen> {
               if (trimmed.isNotEmpty) {
                 widget.item.title = _titleController.text;
                 widget.item.description = _descriptionController.text;
-                context.read<CollectorProvider>().editItem(widget.item).then(
-                      (value) => Navigator.pop(context),
-                    );
+                context.read<CollectorProvider>()
+                  ..editItem(widget.item).then(
+                    (value) => Navigator.pop(context),
+                  )
+                  ..sortItems(
+                    context.read<SettingsProvider>().sortingMethod,
+                  );
               } else {
                 var snackBar = const SnackBar(
                   content: Text('Title required'),

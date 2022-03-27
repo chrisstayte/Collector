@@ -48,7 +48,9 @@ class MyApp extends StatelessWidget {
       title: 'Collector',
       showSemanticsDebugger: false,
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.light,
+      themeMode: context.watch<SettingsProvider>().isDarkMode
+          ? ThemeMode.dark
+          : ThemeMode.light,
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: Global.colors.lightIconColor,
         appBarTheme: AppBarTheme(

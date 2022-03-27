@@ -31,6 +31,8 @@ class SettingsProvider extends ChangeNotifier {
     _sortingMethod = SortingMethod.values.byName(
         prefs.getString('sortingMethod') ?? SortingMethod.dateAscending.name);
 
+    _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+
     notifyListeners();
   }
 
@@ -112,6 +114,15 @@ class SettingsProvider extends ChangeNotifier {
   void setSortingMethod(SortingMethod value) async {
     _sortingMethod = value;
     await prefs.setString('sortingMethod', value.name);
+    notifyListeners();
+  }
+
+  bool _isDarkMode = false;
+  bool get isDarkMode => _isDarkMode;
+
+  void setIsDarkMode(bool value) async {
+    _isDarkMode = value;
+    await prefs.setBool('isDarkMode', value);
     notifyListeners();
   }
 }
