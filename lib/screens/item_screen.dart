@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:collector/global/Global.dart';
+import 'package:collector/main.dart';
 import 'package:collector/models/item.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/utilities/extensions.dart';
@@ -6,6 +9,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
 class ItemScreen extends StatefulWidget {
@@ -52,15 +57,17 @@ class _ItemScreenState extends State<ItemScreen> {
                 ),
               ),
               Center(
-                child: PhysicalModel(
-                  color: Colors.transparent,
-                  elevation: 5,
-                  child: Container(
-                    height: 290,
-                    width: 250,
-                    color: Colors.blue,
-                    child: Center(
-                      child: Text('Image Goes Here'),
+                child: SizedBox(
+                  height: 400,
+                  child: ClipRect(
+                    child: PhotoView(
+                      imageProvider: FileImage(
+                        File('$documentsFolder/${widget.item.photoPath}'),
+                      ),
+                      enableRotation: true,
+                      backgroundDecoration: BoxDecoration(
+                        color: Colors.transparent,
+                      ),
                     ),
                   ),
                 ),
@@ -124,7 +131,7 @@ class _ItemScreenState extends State<ItemScreen> {
                           ),
                         ),
                         Text(
-                          '${widget.item.latitude.toStringAsFixed(4)}, ${widget.item.longitude.toStringAsFixed(4)}',
+                          '${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}',
                         )
                       ],
                     ),
@@ -189,6 +196,7 @@ class _ItemScreenState extends State<ItemScreen> {
               Visibility(
                 visible: widget.item.description.trim().isNotEmpty,
                 child: Flexible(
+                  flex: 1,
                   child: Card(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),

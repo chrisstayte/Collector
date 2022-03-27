@@ -13,9 +13,15 @@ import 'package:collector/screens/settings_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
+late String documentsFolder;
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await getApplicationDocumentsDirectory().then(
+    (value) => documentsFolder = value.path,
+  );
   runApp(
     MultiProvider(
       providers: [

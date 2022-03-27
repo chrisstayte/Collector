@@ -48,6 +48,7 @@ class CollectorProvider extends ChangeNotifier {
   Future<void> _loadCollectorItems() async {
     try {
       File file = await _localFile;
+      print(file.path);
       if (!await file.exists()) {
         return;
       }

@@ -6,6 +6,7 @@ import 'package:collector/models/item.dart';
 import 'package:collector/models/addItemArguments.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -34,22 +35,34 @@ class _AddItemScreenState extends State<AddItemScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('Add Item'),
+        leading: IconButton(
+          icon: FaIcon(FontAwesomeIcons.ban),
+          onPressed: () =>
+              File(widget.newItemArguments.photo.path).delete().then(
+                    (value) => Navigator.pop(context),
+                  ),
+        ),
         actions: [
           IconButton(
             onPressed: () async {
               var trimmed = _titleTextBox.trim();
               if (trimmed.isNotEmpty) {
-                // final directory = await getApplicationDocumentsDirectory();
-                // final uuid = Uuid();
-                // final path = '${directory.path}/${uuid.v4()}.jpg';
-                // await widget.newItemArguments.photo.saveTo(path);
+                final directory = await getApplicationDocumentsDirectory();
+                final uuid = Uuid();
+                final name = uuid.v4() + '.jpg';
+                final path = '${directory.path}/$name';
+
+                await widget.newItemArguments.photo.saveTo(path);
+
+                await File(widget.newItemArguments.photo.path).delete();
 
                 Item item = Item(
                   title: _titleTextBox,
                   description: _descriptionTextBox,
                   dateTime: _dateTime,
-                  photoPath: widget.newItemArguments.photo.path,
+                  photoPath: name,
                   latitude: widget.newItemArguments.latitude,
                   longitude: widget.newItemArguments.longitude,
                   altitude: widget.newItemArguments.altitude,

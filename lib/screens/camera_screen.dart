@@ -15,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -182,7 +183,7 @@ class _CameraScreenState extends State<CameraScreen>
                       width: 60,
                       child: Text(
                         _heading.cardinalDirection(),
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.left,
                       ),
                     ),
                     avatar: FaIcon(
@@ -198,7 +199,7 @@ class _CameraScreenState extends State<CameraScreen>
                       : false,
                   child: Chip(
                     label: Text(
-                        '${_latitude.toStringAsFixed(4)}, ${_longitude.toStringAsFixed(4)}'),
+                        '${_latitude.toStringAsFixed(5)}, ${_longitude.toStringAsFixed(5)}'),
                     avatar: FaIcon(
                       FontAwesomeIcons.locationCrosshairs,
                       color: Global.colors.darkIconColor,
@@ -211,7 +212,9 @@ class _CameraScreenState extends State<CameraScreen>
                       ? context.watch<SettingsProvider>().showAltitude
                       : false,
                   child: Chip(
-                    label: Text(_altitude.round().toString()),
+                    label: Text(context.read<SettingsProvider>().useMetricForAlt
+                        ? '${_altitude.round().toString()} m '
+                        : '${(_altitude * 3.28084).round().toString()} ft'),
                     avatar: FaIcon(
                       FontAwesomeIcons.circleChevronUp,
                       color: Global.colors.darkIconColor,
@@ -270,11 +273,12 @@ class _CameraScreenState extends State<CameraScreen>
             right: 0,
             child: ClipRect(
               child: SizedBox(
-                  height: 45,
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(),
-                  )),
+                height: 45,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(),
+                ),
+              ),
             ),
           ),
         ],

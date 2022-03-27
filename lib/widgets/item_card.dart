@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:collector/global/Global.dart';
 import 'package:collector/models/item.dart';
@@ -5,7 +7,9 @@ import 'package:flutter/material.dart';
 
 class ItemCard extends StatelessWidget {
   final Item item;
-  const ItemCard({Key? key, required this.item}) : super(key: key);
+  final String documentsFolder;
+  const ItemCard({Key? key, required this.item, required this.documentsFolder})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +29,10 @@ class ItemCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                   color: Global.colors.darkIconColor,
                 ),
-                // child: Image.file(
-                //   File(item.photoPath),
-                //   fit: BoxFit.cover,
-                // ),
+                child: Image.file(
+                  File('$documentsFolder/${item.photoPath}'),
+                  fit: BoxFit.cover,
+                ),
               ),
               const SizedBox(
                 width: 10,
@@ -58,7 +62,7 @@ class ItemCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${item.latitude.toStringAsFixed(4)}, ${item.longitude.toStringAsFixed(4)}',
+                        '${item.latitude.toStringAsFixed(5)}, ${item.longitude.toStringAsFixed(5)}',
                         style: TextStyle(
                           fontSize: 14,
                           color: Global.colors.darkIconColor,

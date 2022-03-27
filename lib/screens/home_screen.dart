@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:collector/global/Global.dart';
+import 'package:collector/main.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/widgets/item_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -165,6 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       item: context
                           .read<CollectorProvider>()
                           .collectorItems[index],
+                      documentsFolder: documentsFolder,
                     ),
                   );
                 },

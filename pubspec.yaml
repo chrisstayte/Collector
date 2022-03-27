@@ -29,6 +29,12 @@ dependencies:
   flutter_sms: ^2.3.2
   photo_view: ^0.13.0
 
+dependency_overrides:
+  photo_view:
+    git:
+      url: https://github.com/bluefireteam/photo_view
+      ref: master
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
