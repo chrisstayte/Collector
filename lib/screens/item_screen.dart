@@ -16,7 +16,9 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:path/path.dart' as p;
 
 class ItemScreen extends StatefulWidget {
   const ItemScreen({Key? key, required this.item}) : super(key: key);
@@ -68,7 +70,13 @@ class _ItemScreenState extends State<ItemScreen> {
                   leading: Icon(Icons.delete),
                   title: Text('Delete'),
                 ),
-              )
+              ),
+              PopupMenuItem(
+                  value: 5,
+                  child: ListTile(
+                    leading: Icon(Icons.share),
+                    title: Text('Share'),
+                  )),
             ],
             onSelected: (value) async {
               switch (value) {
@@ -129,6 +137,21 @@ class _ItemScreenState extends State<ItemScreen> {
                       );
                     },
                   );
+                  break;
+                case 5:
+                  await getTemporaryDirectory().then((value) {
+                    print(p.basename(widget.item.photoPath));
+                    File(widget.item.photoPath)
+                        .copy('${value.path}')
+                        .then((value2) {
+                      Share.shareFiles(
+                        [value2.path],
+                        text:
+                            '${widget.item.title}\n${widget.item.dateTime}\nHeading: ${widget.item.heading.cardinalDirection()}\nPosition: ${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}\nAltitude: ${context.read<SettingsProvider>().useMetricForAlt ? '${widget.item.altitude.round().toString()} m ' : '${(widget.item.altitude * 3.28084).round().toString()} ft'}',
+                      );
+                    });
+                  });
+
                   break;
               }
             },
