@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:collector/global/Global.dart';
+import 'package:collector/main.dart';
 import 'package:collector/models/item.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/utilities/extensions.dart';
@@ -13,16 +14,18 @@ import 'package:provider/provider.dart';
 
 class ItemCard extends StatelessWidget {
   final Item item;
-  final String documentsFolder;
-  const ItemCard({Key? key, required this.item, required this.documentsFolder})
-      : super(key: key);
+
+  const ItemCard({Key? key, required this.item}) : super(key: key);
 
   final bool _screenshotMode = true;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 0,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -35,10 +38,12 @@ class ItemCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(5),
                 color: Global.colors.darkIconColor,
               ),
-              child: Image.file(
-                File('$documentsFolder/${item.photoPath}'),
-                fit: BoxFit.cover,
-              ),
+              child: item.photoPath.isNotEmpty
+                  ? Image.file(
+                      File('$documentsFolder/${item.photoPath}'),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
             const SizedBox(
               width: 10,
@@ -76,7 +81,7 @@ class ItemCard extends StatelessWidget {
                         label: Text(item.heading.cardinalDirection()),
                       ),
                       Chip(
-                        avatar: FaIcon(FontAwesomeIcons.solidCompass),
+                        avatar: FaIcon(FontAwesomeIcons.circleArrowUp),
                         label: Text(context
                                 .read<SettingsProvider>()
                                 .useMetricForAlt

@@ -85,10 +85,11 @@ class CollectorProvider extends ChangeNotifier {
     await _saveCollectorItems();
   }
 
-  Future<void> deleteItem(Item item) async {
-    _collectorItems.remove(item);
+  Future<Item> deleteItem(Item item) async {
+    item = _collectorItems.removeAt(_collectorItems.indexOf(item));
     notifyListeners();
     await _saveCollectorItems();
+    return item;
   }
 
   Future<void> deleteAllItems() async {

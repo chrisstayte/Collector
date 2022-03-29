@@ -7,12 +7,11 @@ import 'package:collector/models/item.dart';
 import 'package:collector/providers/collector_provider.dart';
 import 'package:collector/providers/settings_provider.dart';
 import 'package:collector/utilities/extensions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms/flutter_sms.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
@@ -46,60 +45,42 @@ class _ItemScreenState extends State<ItemScreen> {
               PopupMenuItem(
                 value: 1,
                 child: ListTile(
-                  leading: Icon(Icons.textsms),
-                  title: Text('Share SMS'),
+                  leading: Icon(Icons.share),
+                  title: Text('Share'),
                 ),
               ),
               PopupMenuItem(
                 value: 2,
-                child: ListTile(
-                  leading: Icon(Icons.email),
-                  title: Text('Share Email'),
-                ),
-              ),
-              PopupMenuItem(
-                value: 3,
                 child: ListTile(
                   leading: Icon(Icons.edit),
                   title: Text('Edit'),
                 ),
               ),
               PopupMenuItem(
-                value: 4,
+                value: 3,
                 child: ListTile(
                   leading: Icon(Icons.delete),
                   title: Text('Delete'),
                 ),
               ),
-              PopupMenuItem(
-                  value: 5,
-                  child: ListTile(
-                    leading: Icon(Icons.share),
-                    title: Text('Share'),
-                  )),
             ],
             onSelected: (value) async {
               switch (value) {
                 case 1:
-                  await sendSMS(
-                    message:
-                        '${widget.item.title}\n${widget.item.dateTime}\nHeading: ${widget.item.heading.cardinalDirection()}\nPosition: ${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}\nAltitude: ${context.read<SettingsProvider>().useMetricForAlt ? '${widget.item.altitude.round().toString()} m ' : '${(widget.item.altitude * 3.28084).round().toString()} ft'}',
-                    recipients: [],
-                  );
+                  await getTemporaryDirectory().then((value) {
+                    File('$documentsFolder/${widget.item.photoPath}')
+                        .copy('${value.path}/${widget.item.photoPath}')
+                        .then((value2) {
+                      Share.shareFiles(
+                        [value2.path],
+                        subject: 'Collector: ${widget.item.title}',
+                        text:
+                            '${widget.item.title}\n${widget.item.dateTime}\nHeading: ${widget.item.heading.cardinalDirection()}\nPosition: ${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}\nAltitude: ${context.read<SettingsProvider>().useMetricForAlt ? '${widget.item.altitude.round().toString()} m ' : '${(widget.item.altitude * 3.28084).round().toString()} ft'}',
+                      );
+                    });
+                  });
                   break;
                 case 2:
-                  final Uri params = Uri(
-                    scheme: 'mailto',
-                    query:
-                        'subject= Collector - ${widget.item.title}&body=${widget.item.title}\n${widget.item.dateTime}\nHeading: ${widget.item.heading.cardinalDirection()}\nPosition: ${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}\nAltitude: ${context.read<SettingsProvider>().useMetricForAlt ? '${widget.item.altitude.round().toString()} m ' : '${(widget.item.altitude * 3.28084).round().toString()} ft'}',
-                  );
-
-                  final String url = params.toString();
-                  if (await canLaunch(url)) {
-                    await (launch(url));
-                  }
-                  break;
-                case 3:
                   await Navigator.pushNamed(
                     context,
                     '/editItem',
@@ -110,7 +91,7 @@ class _ItemScreenState extends State<ItemScreen> {
                     ),
                   );
                   break;
-                case 4:
+                case 3:
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -137,21 +118,6 @@ class _ItemScreenState extends State<ItemScreen> {
                       );
                     },
                   );
-                  break;
-                case 5:
-                  await getTemporaryDirectory().then((value) {
-                    print(p.basename(widget.item.photoPath));
-                    File(widget.item.photoPath)
-                        .copy('${value.path}')
-                        .then((value2) {
-                      Share.shareFiles(
-                        [value2.path],
-                        text:
-                            '${widget.item.title}\n${widget.item.dateTime}\nHeading: ${widget.item.heading.cardinalDirection()}\nPosition: ${widget.item.latitude.toStringAsFixed(5)}, ${widget.item.longitude.toStringAsFixed(5)}\nAltitude: ${context.read<SettingsProvider>().useMetricForAlt ? '${widget.item.altitude.round().toString()} m ' : '${(widget.item.altitude * 3.28084).round().toString()} ft'}',
-                      );
-                    });
-                  });
-
                   break;
               }
             },
@@ -190,67 +156,93 @@ class _ItemScreenState extends State<ItemScreen> {
                   ),
                 ],
               ),
-
+              // Center(
+              //   child: SizedBox(
+              //     height: 400,
+              //     child: widget.item.photoPath.isNotEmpty
+              //         ? ClipRect(
+              //             child: PhotoView(
+              //               imageProvider: FileImage(
+              //                 File('$documentsFolder/${widget.item.photoPath}'),
+              //               ),
+              //               enableRotation: true,
+              //               backgroundDecoration: BoxDecoration(
+              //                 color: Colors.transparent,
+              //               ),
+              //             ),
+              //           )
+              //         : null,
+              //   ),
+              // ),
+              // Center(
+              //   child: GestureDetector(
+              //     onTap: () => Navigator.pushNamed(
+              //       context,
+              //       '/fullscreenImage',
+              //       arguments: widget.item.photoPath,
+              //     ),
+              //     child: Hero(
+              //       tag: 'image',
+              //       child: Image.file(
+              //         File('$documentsFolder/${widget.item.photoPath}'),
+              //         height: 400,
+              //       ),
+              //     ),
+              //   ),
+              // ),
               Center(
-                child: SizedBox(
-                  height: 400,
-                  child: ClipRect(
-                    child: PhotoView(
-                      imageProvider: FileImage(
-                        File('$documentsFolder/${widget.item.photoPath}'),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      // MaterialPageRoute(
+                      //   builder: (context) => HeroPhotoViewRouteWrapper(
+                      //     imageProvider: FileImage(
+                      //       File(
+                      //         '$documentsFolder/${widget.item.photoPath}',
+                      //       ),
+                      //     ),
+                      //     backgroundDecoration: BoxDecoration(
+                      //       color: context.read<SettingsProvider>().isDarkMode
+                      //           ? Global.colors.darkIconColor
+                      //           : Global.colors.lightIconColor,
+                      //     ),
+                      //     minScale: PhotoViewComputedScale.contained * 0.8,
+                      //     maxScale: PhotoViewComputedScale.covered * 1.5,
+                      //   ),
+                      // ),
+                      PageTransition(
+                        type: PageTransitionType.scale,
+                        alignment: Alignment.center,
+                        child: HeroPhotoViewRouteWrapper(
+                          imageProvider: FileImage(
+                            File(
+                              '$documentsFolder/${widget.item.photoPath}',
+                            ),
+                          ),
+                          backgroundDecoration: BoxDecoration(
+                            color: context.read<SettingsProvider>().isDarkMode
+                                ? Global.colors.darkIconColor
+                                : Global.colors.lightIconColor,
+                          ),
+                          minScale: PhotoViewComputedScale.contained * 0.8,
+                          maxScale: PhotoViewComputedScale.covered * 1.5,
+                        ),
                       ),
-                      enableRotation: true,
-                      backgroundDecoration: BoxDecoration(
-                        color: Colors.transparent,
+                    );
+                  },
+                  child: Container(
+                    child: Hero(
+                      tag: "image",
+                      child: Image.file(
+                        File('$documentsFolder/${widget.item.photoPath}'),
+                        height: 450,
                       ),
                     ),
                   ),
                 ),
               ),
               SizedBox(height: 15),
-              // SizedBox(
-              //   height: 44,
-              //   child: Row(
-              //     children: [
-              //       Expanded(
-              //         child: Padding(
-              //           padding: EdgeInsets.only(right: 10),
-              //           child: GestureDetector(
-              //             onTap: () async {
-              //               await sendSMS(
-              //                 message: '${widget.item.title}',
-              //                 recipients: [],
-              //               );
-              //             },
-              //             child: Card(
-              //               color: Global.colors.lightIconColorDarker,
-              //               child: Center(
-              //                 child: FaIcon(
-              //                   FontAwesomeIcons.commentSms,
-              //                   color: Colors.white,
-              //                 ),
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       Expanded(
-              //         child: Padding(
-              //           padding: EdgeInsets.only(left: 10),
-              //           child: Card(
-              //             color: Global.colors.lightIconColorDarker,
-              //             child: Center(
-              //               child: FaIcon(
-              //                 FontAwesomeIcons.envelope,
-              //                 color: Colors.white,
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       )
-              //     ],
-              //   ),
-              // ),
               SizedBox(
                 height: 44,
                 child: Card(
@@ -348,6 +340,41 @@ class _ItemScreenState extends State<ItemScreen> {
               )
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class HeroPhotoViewRouteWrapper extends StatelessWidget {
+  const HeroPhotoViewRouteWrapper({
+    required this.imageProvider,
+    this.backgroundDecoration,
+    this.minScale,
+    this.maxScale,
+  });
+
+  final ImageProvider imageProvider;
+  final BoxDecoration? backgroundDecoration;
+  final dynamic minScale;
+  final dynamic maxScale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints.expand(
+        height: MediaQuery.of(context).size.height,
+      ),
+      child: GestureDetector(
+        onTapDown: (_) => Navigator.pop(context),
+        child: PhotoView(
+          imageProvider: imageProvider,
+          backgroundDecoration: backgroundDecoration,
+          enableRotation: true,
+          minScale: minScale,
+          maxScale: maxScale,
+          disableGestures: false,
+          heroAttributes: const PhotoViewHeroAttributes(tag: "image"),
         ),
       ),
     );

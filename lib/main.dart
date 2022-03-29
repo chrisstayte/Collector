@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Collector',
       showSemanticsDebugger: false,
+      debugShowMaterialGrid: false,
       debugShowCheckedModeBanner: false,
       themeMode: context.watch<SettingsProvider>().isDarkMode
           ? ThemeMode.dark

@@ -20,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //final GlobalKey<AnimatedListState> _listKey = GlobalKey();
   final _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   late String _searchText = '';
@@ -57,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: DropdownButton(
+            underline: SizedBox(),
             value: context.watch<SettingsProvider>().sortingMethod,
             onChanged: (value) {
               context
@@ -88,8 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-              onPressed: () => Navigator.pushNamed(context, '/settings'),
-              icon: FaIcon(FontAwesomeIcons.gear))
+            onPressed: () => Navigator.pushNamed(context, '/settings'),
+            icon: FaIcon(FontAwesomeIcons.gear),
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -109,8 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               height: 64,
               child: Card(
-                elevation:
-                    _focusNode.hasFocus || _searchText.isNotEmpty ? 3 : 0,
+                elevation: _searchText.isNotEmpty ? 3 : 0,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
@@ -126,8 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           controller: _controller,
                           focusNode: _focusNode,
                           decoration: InputDecoration(
-                            border: InputBorder.none,
-                          ),
+                              border: InputBorder.none,
+                              hintText: 'Search Items'),
                         ),
                       ),
                       Visibility(
@@ -148,61 +150,170 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount:
-                    context.watch<CollectorProvider>().collectorItems.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onLongPress: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text(
-                              'Delete ${context.read<CollectorProvider>().collectorItems[index].title}',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => context
-                                    .read<CollectorProvider>()
-                                    .deleteItem(context
-                                        .read<CollectorProvider>()
-                                        .collectorItems[index])
-                                    .then(
-                                      (value) => Navigator.pop(context),
+              child: context.watch<CollectorProvider>().collectorItems.length >
+                      0
+                  ? ListView.separated(
+                      itemCount: context
+                          .watch<CollectorProvider>()
+                          .collectorItems
+                          .length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onLongPress: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    'Delete ${context.read<CollectorProvider>().collectorItems[index].title}',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => context
+                                          .read<CollectorProvider>()
+                                          .deleteItem(context
+                                              .read<CollectorProvider>()
+                                              .collectorItems[index])
+                                          .then(
+                                            (value) => Navigator.pop(context),
+                                          ),
+                                      child: Text('Yes'),
                                     ),
-                                child: Text('Yes'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text('No'),
-                              )
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      '/item',
-                      arguments: context
-                          .read<CollectorProvider>()
-                          .collectorItems[index],
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('No'),
+                                    )
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            '/item',
+                            arguments: context
+                                .read<CollectorProvider>()
+                                .collectorItems[index],
+                          ),
+                          child: ItemCard(
+                            key: Key(context
+                                .read<CollectorProvider>()
+                                .collectorItems[index]
+                                .photoPath),
+                            item: context
+                                .read<CollectorProvider>()
+                                .collectorItems[index],
+                          ),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return SizedBox(
+                          height: 10,
+                        );
+                      },
+                    )
+                  : Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 80.0),
+                        child: Text(
+                          _controller.text.isEmpty
+                              ? 'Looks like there is no data\nClick the camera button to get started'
+                              : 'No Results',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
                     ),
-                    child: ItemCard(
-                      key: Key(context
-                          .read<CollectorProvider>()
-                          .collectorItems[index]
-                          .photoPath),
-                      item: context
-                          .read<CollectorProvider>()
-                          .collectorItems[index],
-                      documentsFolder: documentsFolder,
-                    ),
-                  );
-                },
-              ),
             ),
+            // TODO: add animation to list
+            // Expanded(
+            //   child: AnimatedList(
+            //     key: _listKey,
+            //     initialItemCount:
+            //         context.watch<CollectorProvider>().collectorItems.length,
+            //     itemBuilder: (BuildContext context, int index, animation) {
+            //       return GestureDetector(
+            //         onLongPress: () {
+            //           showDialog(
+            //             context: context,
+            //             builder: (context) {
+            //               return AlertDialog(
+            //                 title: Text(
+            //                   'Delete ${context.read<CollectorProvider>().collectorItems[index].title}',
+            //                 ),
+            //                 actions: [
+            //                   TextButton(
+            //                     onPressed: () => context
+            //                         .read<CollectorProvider>()
+            //                         .deleteItem(context
+            //                             .read<CollectorProvider>()
+            //                             .collectorItems[index])
+            //                         .then(
+            //                       (value) {
+            //                         Navigator.pop(context);
+            //                         _listKey.currentState!.removeItem(
+            //                           index,
+            //                           (context, animation) {
+            //                             return FadeTransition(
+            //                               opacity: CurvedAnimation(
+            //                                 parent: animation,
+            //                                 curve: const Interval(0.5, 1.0),
+            //                               ),
+            //                               child: SizeTransition(
+            //                                 sizeFactor: CurvedAnimation(
+            //                                     parent: animation,
+            //                                     curve:
+            //                                         const Interval(0.0, 1.0)),
+            //                                 axisAlignment: 0.0,
+            //                                 child: ItemCard(
+            //                                   key: Key(context
+            //                                       .read<CollectorProvider>()
+            //                                       .collectorItems[index]
+            //                                       .photoPath),
+            //                                   item: context
+            //                                       .read<CollectorProvider>()
+            //                                       .collectorItems[index],
+            //                                 ),
+            //                               ),
+            //                             );
+            //                           },
+            //                           duration:
+            //                               const Duration(milliseconds: 600),
+            //                         );
+            //                       },
+            //                     ),
+            //                     child: Text('Yes'),
+            //                   ),
+            //                   TextButton(
+            //                     onPressed: () => Navigator.pop(context),
+            //                     child: Text('No'),
+            //                   )
+            //                 ],
+            //               );
+            //             },
+            //           );
+            //         },
+            //         onTap: () => Navigator.pushNamed(
+            //           context,
+            //           '/item',
+            //           arguments: context
+            //               .read<CollectorProvider>()
+            //               .collectorItems[index],
+            //         ),
+            //         child: ItemCard(
+            //           key: Key(context
+            //               .read<CollectorProvider>()
+            //               .collectorItems[index]
+            //               .photoPath),
+            //           item: context
+            //               .read<CollectorProvider>()
+            //               .collectorItems[index],
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),
