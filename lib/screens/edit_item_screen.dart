@@ -45,11 +45,11 @@ class _EditItemScreenState extends State<EditItemScreen> {
                 widget.item.title = _titleController.text;
                 widget.item.description = _descriptionController.text;
                 context.read<CollectorProvider>()
-                  ..editItem(widget.item).then(
-                    (value) => Navigator.pop(context),
-                  )
+                  ..editItem(widget.item)
                   ..sortItems(
                     context.read<SettingsProvider>().sortingMethod,
+                  ).then(
+                    (value) => Navigator.pop(context),
                   );
               } else {
                 var snackBar = const SnackBar(

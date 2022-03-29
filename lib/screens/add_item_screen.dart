@@ -74,13 +74,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   ..addItem(item)
                   ..sortItems(
                     context.read<SettingsProvider>().sortingMethod,
+                  ).then(
+                    (value) {
+                      if (context
+                          .read<SettingsProvider>()
+                          .stayOnCameraAfterNewItem) {
+                        Navigator.pop(context);
+                      } else {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/', (_) => false);
+                      }
+                    },
                   );
-
-                if (context.read<SettingsProvider>().stayOnCameraAfterNewItem) {
-                  Navigator.pop(context);
-                } else {
-                  Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
-                }
               } else {
                 var snackBar = const SnackBar(
                   content: Text('Title required'),

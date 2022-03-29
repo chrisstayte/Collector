@@ -385,26 +385,6 @@ class _CameraScreenState extends State<CameraScreen>
       _compassStream!.resume();
     } else {
       _compassStream = FlutterCompass.events?.listen((event) {
-        // var cardinalDirection = '';
-        // if (event.heading != null) {
-        //   if (event.heading! > 337.5 || event.heading! <= 22.5) {
-        //     cardinalDirection = 'N';
-        //   } else if (event.heading! > 22.5 && event.heading! <= 67.5) {
-        //     cardinalDirection = 'NE';
-        //   } else if (event.heading! > 67.5 && event.heading! <= 112.5) {
-        //     cardinalDirection = 'E';
-        //   } else if (event.heading! > 112.5 && event.heading! <= 157.5) {
-        //     cardinalDirection = 'SE';
-        //   } else if (event.heading! > 157.5 && event.heading! <= 202.5) {
-        //     cardinalDirection = 'S';
-        //   } else if (event.heading! > 202.5 && event.heading! <= 247.5) {
-        //     cardinalDirection = 'SW';
-        //   } else if (event.heading! > 247.5 && event.heading! <= 292.5) {
-        //     cardinalDirection = 'W';
-        //   } else if (event.heading! > 292.5 && event.heading! <= 337.5) {
-        //     cardinalDirection = 'NW';
-        //   }
-        //}
         setState(() {
           _heading = event.headingForCameraMode ?? 0.0;
         });
