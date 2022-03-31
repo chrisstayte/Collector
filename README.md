@@ -1,16 +1,7 @@
-# collector
+# Collector 
+a photo geotagging app - written in flutter
 
-A new Flutter project.
+This is a remake of an application I wrote in swift in 2016. Since then it was taken off the store because it was not updated to 64 bit (yeah that old) and was not able to be installed on newer version of iOS. 
 
-## Getting Started
+<a href="https://apps.apple.com/us/app/collector-geotag-photos/id1106424851?itscg=30200&amp;itsct=apps_box_appicon" style="width: 170px; height: 170px; border-radius: 22%; overflow: hidden; display: inline-block; vertical-align: middle;"><img src="https://is4-ssl.mzstatic.com/image/thumb/Purple122/v4/96/a5/9b/96a59b55-577f-8066-65eb-97a3b55c57ce/AppIcon-1x_U007emarketing-0-10-0-0-85-220.png/540x540bb.jpg&h=eb9d02bba14e13a79afdb4920ee71764" alt="Collector - Geotag Photos" style="width: 170px; height: 170px; border-radius: 22%; overflow: hidden; display: inline-block; vertical-align: middle;"></a>
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
