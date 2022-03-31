@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.collector">
    <application
-        android:label="collector"
+        android:label="Collector"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/collector">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -31,4 +31,9 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    
+    <!-- Permissions options for the `location` group -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Permissions options for the `camera` group -->
+    <uses-permission android:name="android.permission.CAMERA"/>
 </manifest>
