@@ -31,8 +31,20 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-    
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="*/*" />
+        </intent>
+    </queries>
+    <!-- Permissions options for the 'internet' group -->
+    <uses-permission android:name="android.permission.Internet" />
     <!-- Permissions options for the `location` group -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- Permissions options for the `camera` group -->
     <uses-permission android:name="android.permission.CAMERA"/>
