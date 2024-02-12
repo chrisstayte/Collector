@@ -65,7 +65,6 @@ class _CameraScreenState extends State<CameraScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print(state.toString());
     switch (state) {
       case AppLifecycleState.paused:
         _controller?.dispose();
@@ -78,6 +77,9 @@ class _CameraScreenState extends State<CameraScreen>
         // _setupCamera();
         _setupPage();
         break;
+      case AppLifecycleState.detached:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
     }
     super.didChangeAppLifecycleState(state);
   }

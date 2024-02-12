@@ -1,9 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.collector">
-   <application
-        android:label="Collector"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:label="collector"
         android:name="${applicationName}"
-        android:icon="@mipmap/collector">
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -31,21 +30,4 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="https" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.SEND" />
-            <data android:mimeType="*/*" />
-        </intent>
-    </queries>
-    <!-- Permissions options for the 'internet' group -->
-    <uses-permission android:name="android.permission.Internet" />
-    <!-- Permissions options for the `location` group -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- Permissions options for the `camera` group -->
-    <uses-permission android:name="android.permission.CAMERA"/>
 </manifest>
